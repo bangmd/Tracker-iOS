@@ -93,18 +93,18 @@ final class CategoryViewController: UIViewController{
         stubLabel.removeFromSuperview()
     }
     
-//    private func updateStubUI(){
-//        if categories.isEmpty{
-//            addStubItem()
-//        }else{
-//            removeStubItem()
-//        }
-//    }
+    private func updateStubUI(){
+        if categories.isEmpty{
+            addStubItem()
+        }else{
+            removeStubItem()
+        }
+    }
     
     @objc
     func newCategoryButtonTapped(){
-        //let newHabitViewController = NewHabitViewController()
-       //newHabitViewController.delegate = self
-        //present(newHabitViewController, animated: true)
+        let newHabitViewController = NewHabitViewController()
+        newHabitViewController.delegate = self
+        present(newHabitViewController, animated: true)
     }
 }
