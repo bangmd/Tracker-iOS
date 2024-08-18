@@ -88,6 +88,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         let formattedDate = dateFormatter.string(from: selectedDate)
         filteredTracker(for: selectedDate)
         collectionView.reloadData()
+        updateStubUI()
     }
     
     func addTracker(_ tracker: Tracker, _ categoryName: String){
@@ -117,8 +118,8 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     func didAddNewTracker(tracker: Tracker) {
         addTracker(tracker, "Health")
         filteredTracker(for: datePicker.date)
-        collectionView.reloadData()
         updateStubUI()
+        collectionView.reloadData()
     }
     
     @objc
@@ -139,25 +140,26 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
     }
     
-    private lazy var stubImageView: UIImageView = {
+    private var stubImageView: UIImageView = {
         var stubImageView = UIImageView(image: UIImage(named: "stubImage"))
-        view.addSubview(stubImageView)
         stubImageView.translatesAutoresizingMaskIntoConstraints = false
         return stubImageView
     }()
     
     
-    private lazy var stubLabel: UILabel = {
+    private var stubLabel: UILabel = {
         var stubLabel = UILabel()
         stubLabel.text = "Что будем отслеживать?"
         stubLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         stubLabel.textColor = .blackYP
-        view.addSubview(stubLabel)
         stubLabel.translatesAutoresizingMaskIntoConstraints = false
         return stubLabel
     }()
     
     func addStubItem(){
+        view.addSubview(stubImageView)
+        view.addSubview(stubLabel)
+        
         NSLayoutConstraint.activate([
             stubImageView.widthAnchor.constraint(equalToConstant: 80),
             stubImageView.heightAnchor.constraint(equalToConstant: 80),
