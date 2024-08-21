@@ -4,7 +4,7 @@ protocol AddNewTrackerViewControllerDelegate: AnyObject {
     func didAddNewTracker(tracker: Tracker)
 }
 
-final class AddNewTrackerViewController: UIViewController, NewHabitViewControllerDelegate{
+final class AddNewTrackerViewController: UIViewController, NewHabitViewControllerDelegate, NewIrregularEventViewControllerDelegate{
     weak var delegate: AddNewTrackerViewControllerDelegate?
     
     override func viewDidLoad() {
@@ -60,6 +60,10 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
         delegate?.didAddNewTracker(tracker: tracker)
     }
     
+    func didCreateNewIrregularEvent(tracker: Tracker) {
+        delegate?.didAddNewTracker(tracker: tracker)
+    }
+    
     @objc
     func habitButtonTapped(){
         let newHabitViewController = NewHabitViewController()
@@ -85,5 +89,14 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
             irregularEventButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             irregularEventButton.heightAnchor.constraint(equalToConstant: 60)
         ])
+        
+        irregularEventButton.addTarget(self, action: #selector(irregularEventButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc
+    func irregularEventButtonTapped(){
+        let newIrregularEventViewController = NewIrregularEventViewController()
+        newIrregularEventViewController.delegate = self
+        present(newIrregularEventViewController, animated: true)
     }
 }

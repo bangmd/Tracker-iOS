@@ -18,6 +18,7 @@
 		DB2F5CA22C62960A008FF94F /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2F5CA12C62960A008FF94F /* Tracker.swift */; };
 		DB2F5CA52C629627008FF94F /* TrackerCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2F5CA42C629627008FF94F /* TrackerCategory.swift */; };
 		DB2F5CA72C62962E008FF94F /* TrackerRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2F5CA62C62962E008FF94F /* TrackerRecord.swift */; };
+		DB3D4E672C7635BE00909C20 /* NewIrregularEventViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB3D4E662C7635BE00909C20 /* NewIrregularEventViewController.swift */; };
 		DB9D581F2C6AB265008053D2 /* AddNewTrackerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9D581E2C6AB265008053D2 /* AddNewTrackerViewController.swift */; };
 		DB9D58222C6AB85F008053D2 /* NewHabitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9D58212C6AB85F008053D2 /* NewHabitViewController.swift */; };
 		DB9D58252C6ABDEC008053D2 /* PaddedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9D58242C6ABDEC008053D2 /* PaddedTextField.swift */; };
@@ -43,6 +44,7 @@
 		DB2F5CA12C62960A008FF94F /* Tracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracker.swift; sourceTree = "<group>"; };
 		DB2F5CA42C629627008FF94F /* TrackerCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategory.swift; sourceTree = "<group>"; };
 		DB2F5CA62C62962E008FF94F /* TrackerRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecord.swift; sourceTree = "<group>"; };
+		DB3D4E662C7635BE00909C20 /* NewIrregularEventViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewIrregularEventViewController.swift; sourceTree = "<group>"; };
 		DB9D581E2C6AB265008053D2 /* AddNewTrackerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewTrackerViewController.swift; sourceTree = "<group>"; };
 		DB9D58212C6AB85F008053D2 /* NewHabitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewHabitViewController.swift; sourceTree = "<group>"; };
 		DB9D58242C6ABDEC008053D2 /* PaddedTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddedTextField.swift; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 			children = (
 				DB9D581E2C6AB265008053D2 /* AddNewTrackerViewController.swift */,
 				DB9D58212C6AB85F008053D2 /* NewHabitViewController.swift */,
+				DB3D4E662C7635BE00909C20 /* NewIrregularEventViewController.swift */,
 				DB9D582A2C6D6E63008053D2 /* ScheduleViewController.swift */,
 				DB9D58302C701149008053D2 /* CategoryViewController.swift */,
 			);
@@ -228,6 +231,7 @@
 				DB2F5C5A2C5BEC53008FF94F /* TabBarViewController.swift in Sources */,
 				DB2F5C562C5BE0C0008FF94F /* StatisticViewController.swift in Sources */,
 				DB9D58312C701149008053D2 /* CategoryViewController.swift in Sources */,
+				DB3D4E672C7635BE00909C20 /* NewIrregularEventViewController.swift in Sources */,
 				DB2F5CA52C629627008FF94F /* TrackerCategory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

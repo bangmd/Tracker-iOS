@@ -1,5 +1,10 @@
 import UIKit
 
+enum TrackerType{
+    case habit
+    case oneTimeEvent
+}
+
 enum DayOfWeeks: String, CaseIterable{
     case monday = "Понедельник"
     case tuesday = "Вторник"
@@ -40,12 +45,14 @@ struct Tracker{
     let color: UIColor
     let emoji: String
     let schedule: Set<DayOfWeeks>
+    let type: TrackerType
     
-    init(id: UUID, title: String, color: UIColor, emoji: String, schedule: Set<DayOfWeeks>) {
+    init(id: UUID, title: String, color: UIColor, emoji: String, schedule: Set<DayOfWeeks>, type: TrackerType) {
         self.id = id
         self.title = title
         self.color = color
         self.emoji = emoji
         self.schedule = schedule
+        self.type = type
     }
 }
