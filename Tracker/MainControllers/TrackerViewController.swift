@@ -227,8 +227,12 @@ extension TrackerViewController: UICollectionViewDataSource{
         
         let category = filteredCategories[indexPath.section]
         let tracker = category.trackers[indexPath.row]
+        let record = TrackerRecord(idTracker: tracker.id, date: datePicker.date)
+        let isDone = completedTrackers.contains(record)
+        let totalCompletedCount = completedTrackers.filter { $0.idTracker == tracker.id }.count
         
-        cell.updateCellStatus(with: tracker, for: datePicker.date)
+        cell.updateDayCounter(totalCompletedCount: totalCompletedCount)
+        cell.updateCellStatus(isDone: isDone)
         cell.setValueForCellItems(text: tracker.title, color: tracker.color, emojiText: tracker.emoji)
         
         if filteredCategories.isEmpty{
@@ -284,7 +288,7 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
         guard let indexPath = collectionView.indexPath(for: cell), formattedSelectedDate <= formattedCurrentDate else { return }
         
         var category = filteredCategories[indexPath.section]
-        var tracker = category.trackers[indexPath.row]
+        let tracker = category.trackers[indexPath.row]
         
         let trackerID = tracker.id
         let record = TrackerRecord(idTracker: trackerID, date: selectedDate)
@@ -292,6 +296,7 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
         
         if completedTrackers.contains(record) {
             completedTrackers.remove(record)
+            
         } else {
             completedTrackers.insert(record)
             
@@ -310,12 +315,11 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
             }
         }
         
-        cell.updateCellStatus(with: tracker, for: selectedDate)
-    }
-    
-    
-    func completedTrackersData() -> Set<TrackerRecord>?{
-        return completedTrackers
+        let isDone = completedTrackers.contains(record)
+        let totalCompletedCount = completedTrackers.filter { $0.idTracker == tracker.id }.count
+        
+        cell.updateDayCounter(totalCompletedCount: totalCompletedCount)
+        cell.updateCellStatus(isDone: isDone)
     }
 }
 

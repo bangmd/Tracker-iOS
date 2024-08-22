@@ -1,7 +1,6 @@
 import UIKit
 
 protocol TrackerCollectionViewCellProtocol: AnyObject{
-    func completedTrackersData() -> Set<TrackerRecord>?
     func didTapPlusButton(in cell: TrackerCollectionViewCell)
 }
 
@@ -67,18 +66,9 @@ final class TrackerCollectionViewCell: UICollectionViewCell{
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         return plusButton
     }()
-
-    func updateCellStatus(with tracker: Tracker, for date: Date) {
-        self.tracker = tracker
-        guard let completedTrackers = delegate?.completedTrackersData() else { return }
-        
-        let trackerID = tracker.id
-        let record = TrackerRecord(idTracker: trackerID, date: date)
-        let totalCompletedCount = completedTrackers.filter { $0.idTracker == trackerID }.count
-        
-        dayCounter.text = "\(totalCompletedCount) дней"
     
-        if completedTrackers.contains(record) {
+    func updateCellStatus(isDone: Bool) {
+        if isDone {
             plusButton.setImage(UIImage(named: "checkMark")?.withRenderingMode(.alwaysTemplate), for: .normal)
             plusButton.tintColor = plusButton.tintColor.withAlphaComponent(0.6)
         } else {
@@ -86,10 +76,14 @@ final class TrackerCollectionViewCell: UICollectionViewCell{
             plusButton.tintColor = backCellView.backgroundColor
         }
     }
-
+    
+    func updateDayCounter(totalCompletedCount: Int){
+        dayCounter.text = "\(totalCompletedCount) дней"
+    }
+    
     @objc
     private func plusButtonTapped() {
-         delegate?.didTapPlusButton(in: self)
+        delegate?.didTapPlusButton(in: self)
     }
     
     private func configCell(){
