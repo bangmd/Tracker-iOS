@@ -99,6 +99,7 @@ extension ScheduleViewController: UITableViewDataSource{
         }
         let day = DayOfWeeks.allCases[indexPath.row]
         
+        cell.selectionStyle = .none
         cell.configCell(text: day.rawValue)
         cell.switchView.tag = indexPath.row
         cell.switchView.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)

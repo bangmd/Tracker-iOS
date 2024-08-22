@@ -1,13 +1,13 @@
 import UIKit
 
-protocol NewHabitViewControllerDelegate: AnyObject{
-    func didCreateNewTracker(tracker: Tracker)
+protocol NewIrregularEventViewControllerDelegate: AnyObject{
+    func didCreateNewIrregularEvent(tracker: Tracker)
 }
 
-final class NewHabitViewController: UIViewController, UITextFieldDelegate{
-    let tableInformation = ["Категория", "Расписание"]
+final class NewIrregularEventViewController: UIViewController, UITextFieldDelegate{
+    let tableInformation = ["Категория"]
     var selectedDays: Set<DayOfWeeks> = []
-    weak var delegate: NewHabitViewControllerDelegate?
+    weak var delegate: NewIrregularEventViewControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,7 +16,7 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
     
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
-        titleLabel.text = "Новая привычка"
+        titleLabel.text = "Новое нерегулярное событие"
         titleLabel.textColor = .blackYP
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -83,12 +83,12 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
     private func saveButtonTapped(){
         let newTracker = Tracker(id: UUID(),
                                  title: textField.text ?? "",
-                                 color: .greenYP,
+                                 color: .blackYP,
                                  emoji: "📸",
                                  schedule: selectedDays, 
-                                 type: .habit)
+                                 type: .oneTimeEvent)
         
-        delegate?.didCreateNewTracker(tracker: newTracker)
+        delegate?.didCreateNewIrregularEvent(tracker: newTracker)
         
         if let rootViewController = self.view.window?.rootViewController{
             rootViewController.dismiss(animated: true)
@@ -133,8 +133,8 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
             tableView.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            tableView.bottomAnchor.constraint(equalTo: textField.bottomAnchor, constant: 174),
-            tableView.heightAnchor.constraint(equalToConstant: 150),
+            tableView.bottomAnchor.constraint(equalTo: textField.bottomAnchor, constant: 99),
+            tableView.heightAnchor.constraint(equalToConstant: 75),
             
             stackView.heightAnchor.constraint(equalToConstant: 60),
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
@@ -144,7 +144,7 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
     }
 }
 
-extension NewHabitViewController: UITableViewDataSource{
+extension NewIrregularEventViewController: UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableInformation.count
     }
@@ -160,21 +160,12 @@ extension NewHabitViewController: UITableViewDataSource{
     }
 }
 
-extension NewHabitViewController: UITableViewDelegate{
+extension NewIrregularEventViewController: UITableViewDelegate{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0{
             let categoryViewController = CategoryViewController()
             present(categoryViewController, animated: true)
-        }else if indexPath.row == 1{
-            let scheduleViewController = ScheduleViewController()
-            scheduleViewController.delegate = self
-            present(scheduleViewController, animated: true)
         }
     }
 }
 
-extension NewHabitViewController: ScheduleViewControllerProtocol{
-    func didUpdateSelectedDays(_ selectedDays: Set<DayOfWeeks>) {
-        self.selectedDays = selectedDays
-    }
-}

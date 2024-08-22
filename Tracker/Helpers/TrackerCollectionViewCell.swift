@@ -1,10 +1,9 @@
 import UIKit
 
 protocol TrackerCollectionViewCellProtocol: AnyObject{
-    func didRequestDate() -> Date?
-    func completedTrackersData() -> Set<TrackerRecord>?
-    func updateCompletedTrackers(_ completedTrackers: Set<TrackerRecord>)
+    func didTapPlusButton(in cell: TrackerCollectionViewCell)
 }
+
 final class TrackerCollectionViewCell: UICollectionViewCell{
     weak var delegate: TrackerCollectionViewCellProtocol?
     var tracker: Tracker?
@@ -67,47 +66,24 @@ final class TrackerCollectionViewCell: UICollectionViewCell{
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         return plusButton
     }()
-
-    func updateCellStatus(with tracker: Tracker, for date: Date) {
-        self.tracker = tracker
-        guard let completedTrackers = delegate?.completedTrackersData() else { return }
-        
-        let trackerID = tracker.id
-        let record = TrackerRecord(idTracker: trackerID, date: date)
-        let totalCompletedCount = completedTrackers.filter { $0.idTracker == trackerID }.count
-        
-        dayCounter.text = "\(totalCompletedCount) дней"
     
-        if completedTrackers.contains(record) {
+    func updateCellStatus(isDone: Bool) {
+        if isDone {
             plusButton.setImage(UIImage(named: "checkMark")?.withRenderingMode(.alwaysTemplate), for: .normal)
-            plusButton.tintColor = plusButton.tintColor
+            plusButton.tintColor = plusButton.tintColor.withAlphaComponent(0.6)
         } else {
             plusButton.setImage(UIImage(named: "plusButton"), for: .normal)
             plusButton.tintColor = backCellView.backgroundColor
         }
     }
-
+    
+    func updateDayCounter(totalCompletedCount: Int){
+        dayCounter.text = "\(totalCompletedCount) дней"
+    }
+    
     @objc
     private func plusButtonTapped() {
-        let currentDate = Date()
-        
-        guard let selectedDate = delegate?.didRequestDate(), selectedDate <= currentDate else { return }
-        guard var completedTrackers = delegate?.completedTrackersData() else { return }
-        
-        guard let trackerID = tracker?.id else { return }
-        let record = TrackerRecord(idTracker: trackerID, date: selectedDate)
-        
-        if completedTrackers.contains(record) {
-            completedTrackers.remove(record)
-            plusButton.setImage(UIImage(named: "plusButton"), for: .normal)
-            plusButton.tintColor = backCellView.backgroundColor
-        } else {
-            completedTrackers.insert(record)
-            plusButton.setImage(UIImage(named: "checkMark")?.withRenderingMode(.alwaysTemplate), for: .normal)
-            plusButton.tintColor = plusButton.tintColor
-        }
-        delegate?.updateCompletedTrackers(completedTrackers)
-        updateCellStatus(with: tracker!, for: selectedDate)
+        delegate?.didTapPlusButton(in: self)
     }
     
     private func configCell(){

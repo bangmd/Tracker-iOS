@@ -4,6 +4,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     var categories: [TrackerCategory] = []
     var completedTrackers = Set<TrackerRecord>()
     var filteredCategories: [TrackerCategory] = []
+    var currentDate = Date()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,7 +38,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     
     func addCollectionViewConstraints(){
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.topAnchor, constant: 138),
+            collectionView.topAnchor.constraint(equalTo: view.topAnchor, constant: 153),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -68,7 +69,24 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         var filteredCategories: [TrackerCategory] = []
         
         for category in categories {
-            let filteredTrackers = category.trackers.filter { $0.schedule.contains(dayOfWeek) }
+            var filteredTrackers: [Tracker] = []
+            
+            for tracker in category.trackers {
+                switch tracker.type {
+                case .habit:
+                    if tracker.schedule.contains(dayOfWeek) == true {
+                        filteredTrackers.append(tracker)
+                    }
+                case .oneTimeEvent:
+                    if calendar.isDate(date, inSameDayAs: currentDate) {
+                        let record = TrackerRecord(idTracker: tracker.id, date: date)
+                        
+                        if !completedTrackers.contains(record) {
+                            filteredTrackers.append(tracker)
+                        }
+                    }
+                }
+            }
             
             if !filteredTrackers.isEmpty {
                 filteredCategories.append(TrackerCategory(title: category.title, trackers: filteredTrackers))
@@ -78,7 +96,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         self.filteredCategories = filteredCategories
         collectionView.reloadData()
     }
-
+    
     
     @objc
     func datePickerValueChanged(_ sender: UIDatePicker){
@@ -118,8 +136,8 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     func didAddNewTracker(tracker: Tracker) {
         addTracker(tracker, "Health")
         filteredTracker(for: datePicker.date)
-        updateStubUI()
         collectionView.reloadData()
+        updateStubUI()
     }
     
     @objc
@@ -182,6 +200,13 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
             removeStubItem()
         }
     }
+    
+    func formatDate(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        return dateFormatter.string(from: date)
+    }
+    
 }
 
 
@@ -202,9 +227,17 @@ extension TrackerViewController: UICollectionViewDataSource{
         
         let category = filteredCategories[indexPath.section]
         let tracker = category.trackers[indexPath.row]
+        let record = TrackerRecord(idTracker: tracker.id, date: datePicker.date)
+        let isDone = completedTrackers.contains(record)
+        let totalCompletedCount = completedTrackers.filter { $0.idTracker == tracker.id }.count
         
-        cell.updateCellStatus(with: tracker, for: datePicker.date)
+        cell.updateDayCounter(totalCompletedCount: totalCompletedCount)
+        cell.updateCellStatus(isDone: isDone)
         cell.setValueForCellItems(text: tracker.title, color: tracker.color, emojiText: tracker.emoji)
+        
+        if filteredCategories.isEmpty{
+            
+        }
         return cell
     }
     
@@ -220,6 +253,7 @@ extension TrackerViewController: UICollectionViewDataSource{
         
         let category = filteredCategories[indexPath.section]
         headerView.label.text = category.title
+        
         
         return headerView
     }
@@ -245,16 +279,47 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout{
 }
 
 extension TrackerViewController: TrackerCollectionViewCellProtocol{
-    func updateCompletedTrackers(_ completedTrackers: Set<TrackerRecord>) {
-        self.completedTrackers = completedTrackers
-    }
-    
-    func didRequestDate() -> Date? {
-        return datePicker.date
-    }
-    
-    func completedTrackersData() -> Set<TrackerRecord>?{
-        return completedTrackers
+    func didTapPlusButton(in cell: TrackerCollectionViewCell) {
+        
+        let selectedDate = datePicker.date
+        let formattedSelectedDate = formatDate(selectedDate)
+        let formattedCurrentDate = formatDate(currentDate)
+        
+        guard let indexPath = collectionView.indexPath(for: cell), formattedSelectedDate <= formattedCurrentDate else { return }
+        
+        var category = filteredCategories[indexPath.section]
+        let tracker = category.trackers[indexPath.row]
+        
+        let trackerID = tracker.id
+        let record = TrackerRecord(idTracker: trackerID, date: selectedDate)
+        let calendar = Calendar.current
+        
+        if completedTrackers.contains(record) {
+            completedTrackers.remove(record)
+            
+        } else {
+            completedTrackers.insert(record)
+            
+            if tracker.type == .oneTimeEvent && calendar.isDate(selectedDate, inSameDayAs: currentDate) {
+                category.trackers.remove(at: indexPath.row)
+                
+                if category.trackers.isEmpty {
+                    filteredCategories.remove(at: indexPath.section)
+                    collectionView.deleteSections(IndexSet(integer: indexPath.section))
+                } else {
+                    filteredCategories[indexPath.section] = category
+                    collectionView.deleteItems(at: [indexPath])
+                }
+                
+                return
+            }
+        }
+        
+        let isDone = completedTrackers.contains(record)
+        let totalCompletedCount = completedTrackers.filter { $0.idTracker == tracker.id }.count
+        
+        cell.updateDayCounter(totalCompletedCount: totalCompletedCount)
+        cell.updateCellStatus(isDone: isDone)
     }
 }
 
