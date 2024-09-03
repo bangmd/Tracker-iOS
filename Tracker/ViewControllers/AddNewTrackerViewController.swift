@@ -22,7 +22,7 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
     func addTitle(){
         let label = UILabel()
         label.text = "Создание трекера"
-        label.textColor = .black
+        label.textColor = .blackYP
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         
         view.addSubview(label)
@@ -40,6 +40,7 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
         habitButton.backgroundColor = .blackYP
         habitButton.layer.cornerRadius = 16
         habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        habitButton.setTitleColor(.whiteYP, for: .normal)
         habitButton.titleLabel?.textAlignment = .center
         
         view.addSubview(habitButton)
@@ -77,6 +78,7 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
         irregularEventButton.backgroundColor = .blackYP
         irregularEventButton.layer.cornerRadius = 16
         irregularEventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        irregularEventButton.setTitleColor(.whiteYP, for: .normal)
         irregularEventButton.titleLabel?.textAlignment = .center
         
         view.addSubview(irregularEventButton)

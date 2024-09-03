@@ -6,10 +6,18 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     var filteredCategories: [TrackerCategory] = []
     var currentDate = Date()
     
+    let trackerStore = TrackerStore()
+    let trackerCategoryStore = TrackerCategoryStore()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configView()
+        
         addStubItem()
+        
+        let bitch = trackerCategoryStore.fetchAll()
+        print(bitch)
+
     }
     
     func configView(){
@@ -97,7 +105,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         collectionView.reloadData()
     }
     
-    
     @objc
     func datePickerValueChanged(_ sender: UIDatePicker){
         let selectedDate = sender.date
@@ -120,10 +127,10 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         categories = newCategories
     }
     
-    
     func addPlusLogo(){
         let plusButton = UIButton(type: .custom)
         plusButton.setImage(UIImage(named: "plusLogo"), for: .normal)
+        plusButton.tintColor = .blackYP
         plusButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(plusButton)
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: plusButton)
@@ -163,7 +170,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         stubImageView.translatesAutoresizingMaskIntoConstraints = false
         return stubImageView
     }()
-    
     
     private var stubLabel: UILabel = {
         var stubLabel = UILabel()
@@ -206,7 +212,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         dateFormatter.dateFormat = "dd.MM.yyyy"
         return dateFormatter.string(from: date)
     }
-    
 }
 
 

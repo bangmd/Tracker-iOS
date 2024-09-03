@@ -1,11 +1,11 @@
 import UIKit
 
-enum TrackerType{
-    case habit
-    case oneTimeEvent
+enum TrackerType: String{
+    case habit = "Habit"
+    case oneTimeEvent = "OneTimeEvent"
 }
 
-enum DayOfWeeks: String, CaseIterable{
+enum DayOfWeeks: String, Codable, CaseIterable{
     case monday = "Понедельник"
     case tuesday = "Вторник"
     case wednesday = "Среда"
