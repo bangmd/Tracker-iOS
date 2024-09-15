@@ -2,83 +2,103 @@ import CoreData
 import UIKit
 
 final class TrackerStore {
+    
     private let context: NSManagedObjectContext
     private let uiColorMarshalling = UIColorMarshalling()
-    private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>!
-
-    init(context: NSManagedObjectContext) {
-        self.context = context
-        setupFetchedResultsController()
-    }
-
+    
     convenience init() {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         self.init(context: context)
     }
+    
+    init(context: NSManagedObjectContext) {
+        self.context = context
+    }
+    
+    func deleteAllDataForAllEntities() {
+        let entities = ["TrackerCoreData", "TrackerCategoryCoreData", "TrackerRecordCoreData"]
+        entities.forEach { entity in
+            deleteAllData(entity: entity)
+        }
+    }
 
-    func addNewTracker(_ tracker: Tracker) throws {
-        let trackerEntity = TrackerCoreData(context: context)
-        updateExistingTracker(trackerEntity, with: tracker)
+    func deleteAllData(entity: String) {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entity)
+        fetchRequest.includesPropertyValues = false
+
+        do {
+            let objects = try context.fetch(fetchRequest)
+            for object in objects {
+                guard let objectData = object as? NSManagedObject else { continue }
+                context.delete(objectData)
+            }
+            try context.save()
+        } catch let error {
+            print("Failed to delete all data in \(entity): \(error)")
+        }
+    }
+    
+    func addNewTracker(from tracker: Tracker) -> TrackerCoreData? {
+        guard let trackerCoreData = NSEntityDescription.entity(forEntityName: "TrackerCoreData", in: context) else { return nil }
+        let newTracker = TrackerCoreData(entity: trackerCoreData, insertInto: context)
+        newTracker.id = tracker.id
+        newTracker.title = tracker.title
+        newTracker.color = uiColorMarshalling.hexString(from: tracker.color)
+        newTracker.emoji = tracker.emoji
+        newTracker.schedule = tracker.schedule as NSSet
+        newTracker.type = tracker.type.rawValue
+        return newTracker
+    }
+    
+    func fetchTracker() -> [Tracker] {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return [] }
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
+        let trackerCoreDataArray = try! managedContext.fetch(fetchRequest)
+        let trackers = trackerCoreDataArray.map { trackerCoreData in
+            return Tracker(
+                id: trackerCoreData.id ?? UUID(),
+                title: trackerCoreData.title ?? "",
+                color: uiColorMarshalling.color(from: trackerCoreData.color ?? "") ?? UIColor.clear,
+                emoji: trackerCoreData.emoji ?? "",
+                schedule: trackerCoreData.schedule as? Set<DayOfWeeks> ?? [],
+                type: TrackerType(rawValue: trackerCoreData.type ?? "") ?? TrackerType.oneTimeEvent)
+        }
+        return trackers
+    }
+    
+    func decodingTracker(from trackersCoreData: TrackerCoreData) -> Tracker?{
+        guard let id = trackersCoreData.id, let title = trackersCoreData.title,
+              let color = trackersCoreData.color, let emoji = trackersCoreData.emoji, let type = trackersCoreData.type
+        else { return nil }
+        
+        return Tracker(id: id, title: title, color: uiColorMarshalling.color(from: color) ?? UIColor.clear, emoji: emoji, schedule: trackersCoreData.schedule as! Set<DayOfWeeks> , type: TrackerType(rawValue: type) ?? TrackerType.oneTimeEvent)
+    }
+    
+    func fetchCoreDataTracker(by id: UUID) -> TrackerCoreData? {
+        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        
+        do {
+            let result = try context.fetch(fetchRequest)
+            return result.first
+        } catch {
+            print("Failed to fetch tracker with id \(id): \(error)")
+            return nil
+        }
+    }
+
+    func deleteTracker(_ tracker: TrackerCoreData) {
+        context.delete(tracker)
         saveContext()
     }
-
-    func fetchAll() -> [Tracker] {
-        // Используем fetchedResultsController для получения всех трекеров
-        do {
-            try fetchedResultsController.performFetch()
-            guard let objects = fetchedResultsController.fetchedObjects else { return [] }
-            return convert(entities: objects)
-        } catch {
-            debugPrint("Fetch trackers error \(error)")
-            return []
-        }
-    }
-
-    func updateExistingTracker(_ trackerCoreData: TrackerCoreData, with tracker: Tracker) {
-        trackerCoreData.id = tracker.id
-        trackerCoreData.title = tracker.title
-        trackerCoreData.color = uiColorMarshalling.hexString(from: tracker.color)
-        trackerCoreData.emoji = tracker.emoji
-        trackerCoreData.schedule = tracker.schedule as NSSet
-        trackerCoreData.type = tracker.type.rawValue
-    }
-
-    // MARK: - Private methods:
-
-    private func convert(entities: [TrackerCoreData]) -> [Tracker] {
-        entities.map {
-            let scheduleSet = $0.schedule as? Set<DayOfWeeks> ?? []
-
-            return Tracker(id: $0.id ?? UUID(),
-                           title: $0.title ?? "",
-                           color: uiColorMarshalling.color(from: $0.color ?? "") ?? UIColor.clear,
-                           emoji: $0.emoji ?? "",
-                           schedule: scheduleSet,
-                           type: TrackerType(rawValue: $0.type!) ?? TrackerType.oneTimeEvent)
-        }
-    }
-
-    private func saveContext() {
-        do {
+    
+    private func saveContext(){
+        do{
             try context.save()
         } catch {
             print("Failed to save context: \(error)")
         }
     }
-
-    private func setupFetchedResultsController() {
-        let fetchRequest: NSFetchRequest<TrackerCoreData> = TrackerCoreData.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: "title", ascending: true)
-        ]
-
-        fetchedResultsController = NSFetchedResultsController(
-            fetchRequest: fetchRequest,
-            managedObjectContext: context,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
-
-        // Note: Мы не устанавливаем делегат в этом примере, чтобы не обрабатывать события обновления.
-    }
 }
+

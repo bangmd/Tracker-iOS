@@ -1,7 +1,7 @@
 import UIKit
 
 protocol NewIrregularEventViewControllerDelegate: AnyObject{
-    func didCreateNewIrregularEvent(tracker: Tracker)
+    func didCreateNewIrregularEvent(_ tracker: Tracker, _ category: String)
 }
 
 final class NewIrregularEventViewController: UIViewController, UITextFieldDelegate{
@@ -12,6 +12,7 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
     let colors: [UIColor] = [._1, ._2, ._3, ._4, ._5, ._6, ._7, ._8, ._9, ._10, ._11, ._12, ._13, ._14, ._15, ._16, ._17, ._18]
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
+    private var selectedCategory: TrackerCategory?
    
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -92,7 +93,7 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
                                  schedule: selectedDays,
                                  type: .oneTimeEvent)
         
-        delegate?.didCreateNewIrregularEvent(tracker: newTracker)
+        delegate?.didCreateNewIrregularEvent(newTracker, selectedCategory?.title ?? "")
         
         if let rootViewController = self.view.window?.rootViewController{
             rootViewController.dismiss(animated: true)

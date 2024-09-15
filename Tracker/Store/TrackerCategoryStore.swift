@@ -1,52 +1,63 @@
 import CoreData
 import UIKit
 
-final class TrackerCategoryStore{
+protocol TrackerCategoryStoreDelegate: AnyObject {
+    func didUpdateData(in store: TrackerCategoryStore)
+}
+
+final class TrackerCategoryStore: NSObject {
+    weak var delegate: TrackerCategoryStoreDelegate?
     private let context: NSManagedObjectContext
     private let uiColorMarshalling = UIColorMarshalling()
-    init(context: NSManagedObjectContext) {
-        self.context = context
-    }
+    private let trackerStore = TrackerStore()
     
-    convenience init(){
+    convenience override init() {
         let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
         self.init(context: context)
     }
     
-    func addNewTrackerCategory(_ trackerCategory: TrackerCategory){
-        let trackerCategoryEntity = TrackerCategoryCoreData(context: context)
-        trackerCategoryEntity.title = trackerCategory.title
-        
-        for tracker in trackerCategory.trackers {
-            let trackerEntity = TrackerCoreData(context: context)
-            trackerEntity.id = tracker.id
-            trackerEntity.title = tracker.title
-            trackerEntity.color = uiColorMarshalling.hexString(from: tracker.color)
-            trackerEntity.emoji = tracker.emoji
-            trackerEntity.schedule = tracker.schedule as NSSet
-            trackerEntity.type = tracker.type.rawValue
-            
-            trackerCategoryEntity.addToTrackers(trackerEntity)
-        }
+    init(context: NSManagedObjectContext) {
+        self.context = context
+    }
+}
+
+extension TrackerCategoryStore {
+    func createCategory(_ category: TrackerCategory){
+        guard let entity = NSEntityDescription.entity(forEntityName: "TrackerCategoryCoreData", in: context)
+            else { return }
+        let categoryEntity = TrackerCategoryCoreData(entity: entity, insertInto: context)
+        categoryEntity.title = category.title
+        categoryEntity.trackers = NSSet(array: [])
         saveContext()
     }
     
-    func fetchAll() /*-> [TrackerCategory]*/ {
-        // Используем fetchedResultsController для получения всех трекеров
-        let request = TrackerCategoryCoreData.fetchRequest()
-        do {
-            let objects = try context.fetch(request)
-            return convert(entities: objects)
-        } catch {
-            debugPrint("Fetch trackers error \(error)")
-            //return []
-        }
+    func fetchAllCategories() -> [TrackerCategoryCoreData]{
+        return try! context.fetch(NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData"))
     }
     
-    private func convert(entities: [TrackerCategoryCoreData]) /*-> [TrackerCategory]*/ {
-        entities.map {
-            print($0)
-        }
+    func decodingCategory(from trackerCategoryCoreData: TrackerCategoryCoreData) -> TrackerCategory? {
+        guard let title = trackerCategoryCoreData.title else { return nil }
+        guard let trackers = trackerCategoryCoreData.trackers else { return nil }
+        
+        return TrackerCategory(title: title, trackers: trackers.compactMap { coreDataTracker -> Tracker? in
+            if let coreDataTracker = coreDataTracker as? TrackerCoreData {
+                return trackerStore.decodingTracker(from: coreDataTracker)
+            }
+            return nil
+        })
+    }
+    
+    func createCategoryAndTracker(tracker: Tracker, with titleCategory: String) {
+        guard let trackerCoreData = trackerStore.addNewTracker(from: tracker) else { return }
+        guard let existingCategory = fetchCategory(with: titleCategory) else { return }
+        var existingTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] ?? []
+        existingTrackers.append(trackerCoreData)
+        existingCategory.trackers = NSSet(array: existingTrackers)
+        saveContext()
+    }
+    
+    private func fetchCategory(with title: String) -> TrackerCategoryCoreData? {
+        return fetchAllCategories().filter({$0.title == title}).first ?? nil
     }
     
     private func saveContext(){
@@ -55,5 +66,11 @@ final class TrackerCategoryStore{
         } catch {
             print("Failed to save context: \(error)")
         }
+    }
+}
+
+extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.didUpdateData(in: self)
     }
 }

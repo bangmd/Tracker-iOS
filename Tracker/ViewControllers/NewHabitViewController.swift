@@ -1,7 +1,7 @@
 import UIKit
 
 protocol NewHabitViewControllerDelegate: AnyObject{
-    func didCreateNewTracker(tracker: Tracker)
+    func didCreateNewTracker(_ tracker: Tracker, _ category: String)
 }
 
 final class NewHabitViewController: UIViewController, UITextFieldDelegate{
@@ -12,6 +12,7 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
     let colors: [UIColor] = [._1, ._2, ._3, ._4, ._5, ._6, ._7, ._8, ._9, ._10, ._11, ._12, ._13, ._14, ._15, ._16, ._17, ._18]
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
+    private var selectedCategory: TrackerCategory?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,15 +102,8 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
                                  emoji: selectedEmoji ?? "",
                                  schedule: selectedDays,
                                  type: .habit)
-        do{
-            try TrackerStore().addNewTracker(newTracker)
-            let newCat = TrackerCategory(title: "Bibi", trackers: [newTracker])
-            try TrackerCategoryStore().addNewTrackerCategory(newCat)
-        } catch {
-            print("Failed to save tracker: \(error)")
-        }
         
-        delegate?.didCreateNewTracker(tracker: newTracker)
+        delegate?.didCreateNewTracker(newTracker, selectedCategory?.title ?? "")
         
         if let rootViewController = self.view.window?.rootViewController{
             rootViewController.dismiss(animated: true)

@@ -1,10 +1,11 @@
 import UIKit
 
 protocol AddNewTrackerViewControllerDelegate: AnyObject {
-    func didAddNewTracker(tracker: Tracker)
+    func didAddNewTracker(_ tracker: Tracker, _ category: String)
 }
 
 final class AddNewTrackerViewController: UIViewController, NewHabitViewControllerDelegate, NewIrregularEventViewControllerDelegate{
+    
     weak var delegate: AddNewTrackerViewControllerDelegate?
     
     override func viewDidLoad() {
@@ -57,12 +58,12 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
         habitButton.addTarget(self, action: #selector(habitButtonTapped), for: .touchUpInside)
     }
     
-    func didCreateNewTracker(tracker: Tracker) {
-        delegate?.didAddNewTracker(tracker: tracker)
+    func didCreateNewTracker(_ tracker: Tracker, _ category: String) {
+        delegate?.didAddNewTracker(tracker, category)
     }
     
-    func didCreateNewIrregularEvent(tracker: Tracker) {
-        delegate?.didAddNewTracker(tracker: tracker)
+    func didCreateNewIrregularEvent(_ tracker: Tracker, _ category: String) {
+        delegate?.didAddNewTracker(tracker, category)
     }
     
     @objc

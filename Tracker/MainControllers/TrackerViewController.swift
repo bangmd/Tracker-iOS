@@ -8,16 +8,16 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     
     let trackerStore = TrackerStore()
     let trackerCategoryStore = TrackerCategoryStore()
+    let trackerRecordStore = TrackerRecordStore()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configView()
-        
-        addStubItem()
-        
-        let bitch = trackerCategoryStore.fetchAll()
-        print(bitch)
-
+        fetchCategory()
+        fetchCompletedTrackers()
+        filteredTracker(for: currentDate)
+        updateStubUI()
+        collectionView.reloadData()
     }
     
     func configView(){
@@ -100,7 +100,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
                 filteredCategories.append(TrackerCategory(title: category.title, trackers: filteredTrackers))
             }
         }
-        
         self.filteredCategories = filteredCategories
         collectionView.reloadData()
     }
@@ -140,11 +139,34 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
     }
     
-    func didAddNewTracker(tracker: Tracker) {
-        addTracker(tracker, "Health")
+    func didAddNewTracker(_ tracker: Tracker, _ category: String) {
+        if trackerCategoryStore.fetchAllCategories().filter({ $0.title == category}).count == 0 {
+            let newCategory = TrackerCategory(title: category, trackers: [])
+            trackerCategoryStore.createCategory(newCategory)
+        }
+        
+        createCategoryAndTracker(tracker: tracker, with: category)
+        fetchCategory()
+    
         filteredTracker(for: datePicker.date)
         collectionView.reloadData()
         updateStubUI()
+    }
+    
+    private func fetchCategory() {
+        let coreDataCategories = trackerCategoryStore.fetchAllCategories()
+        categories = coreDataCategories.compactMap { coreDataCategory in
+            let decodedCategory = trackerCategoryStore.decodingCategory(from: coreDataCategory)
+            return decodedCategory
+        }
+    }
+
+    private func fetchCompletedTrackers(){
+        completedTrackers = trackerRecordStore.fetchAllCompletedTrackers()
+    }
+    
+    private func createCategoryAndTracker(tracker: Tracker, with titleCategory: String) {
+        trackerCategoryStore.createCategoryAndTracker(tracker: tracker, with: titleCategory)
     }
     
     @objc
@@ -233,7 +255,11 @@ extension TrackerViewController: UICollectionViewDataSource{
         let category = filteredCategories[indexPath.section]
         let tracker = category.trackers[indexPath.row]
         let record = TrackerRecord(idTracker: tracker.id, date: datePicker.date)
-        let isDone = completedTrackers.contains(record)
+        
+        let isDone = completedTrackers.contains { completedRecord in
+            completedRecord.idTracker == tracker.id && Calendar.current.isDate(completedRecord.date, inSameDayAs: datePicker.date)
+        }
+
         let totalCompletedCount = completedTrackers.filter { $0.idTracker == tracker.id }.count
         
         cell.updateDayCounter(totalCompletedCount: totalCompletedCount)
@@ -285,7 +311,6 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout{
 
 extension TrackerViewController: TrackerCollectionViewCellProtocol{
     func didTapPlusButton(in cell: TrackerCollectionViewCell) {
-        
         let selectedDate = datePicker.date
         let formattedSelectedDate = formatDate(selectedDate)
         let formattedCurrentDate = formatDate(currentDate)
@@ -299,11 +324,12 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
         let record = TrackerRecord(idTracker: trackerID, date: selectedDate)
         let calendar = Calendar.current
         
-        if completedTrackers.contains(record) {
-            completedTrackers.remove(record)
-            
+        if let existingRecord = completedTrackers.first(where: { $0.idTracker == trackerID && calendar.isDate($0.date, inSameDayAs: selectedDate) }) {
+            completedTrackers.remove(existingRecord)
+            trackerRecordStore.removeRecord(for: existingRecord)
         } else {
             completedTrackers.insert(record)
+            trackerRecordStore.addNewRecord(from: record)
             
             if tracker.type == .oneTimeEvent && calendar.isDate(selectedDate, inSameDayAs: currentDate) {
                 category.trackers.remove(at: indexPath.row)
@@ -316,16 +342,27 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
                     collectionView.deleteItems(at: [indexPath])
                 }
                 
+                if let coreDataTracker = trackerStore.fetchCoreDataTracker(by: tracker.id) {
+                    trackerStore.deleteTracker(coreDataTracker)
+                }
+                
+                if let originalCategoryIndex = categories.firstIndex(where: { $0.title == category.title }) {
+                    categories[originalCategoryIndex].trackers.removeAll(where: { $0.id == tracker.id })
+                    
+                    if categories[originalCategoryIndex].trackers.isEmpty {
+                        categories.remove(at: originalCategoryIndex)
+                    }
+                }
+                            
                 return
             }
         }
         
-        let isDone = completedTrackers.contains(record)
+        let isDone = completedTrackers.contains { $0.idTracker == trackerID && calendar.isDate($0.date, inSameDayAs: selectedDate) }
         let totalCompletedCount = completedTrackers.filter { $0.idTracker == tracker.id }.count
         
         cell.updateDayCounter(totalCompletedCount: totalCompletedCount)
         cell.updateCellStatus(isDone: isDone)
     }
 }
-
 
