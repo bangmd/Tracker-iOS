@@ -2,7 +2,7 @@ import Foundation
 import CoreData
 
 @objc(ScheduleTransformer)
-class ScheduleTransformer: ValueTransformer {
+final class ScheduleTransformer: ValueTransformer {
     override class func transformedValueClass() -> AnyClass { NSData.self }
     override class func allowsReverseTransformation() -> Bool { true }
 

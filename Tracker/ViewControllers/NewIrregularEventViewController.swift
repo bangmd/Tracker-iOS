@@ -4,21 +4,19 @@ protocol NewIrregularEventViewControllerDelegate: AnyObject{
     func didCreateNewIrregularEvent(_ tracker: Tracker, _ category: String)
 }
 
-final class NewIrregularEventViewController: UIViewController, UITextFieldDelegate{
+final class NewIrregularEventViewController: UIViewController, UITextFieldDelegate, ViewSetupProtocol{
+    // MARK: - Public Properties
     let tableInformation = ["Категория"]
     var selectedDays: Set<DayOfWeeks> = []
     weak var delegate: NewIrregularEventViewControllerDelegate?
     let emojis = ["😊", "😍", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
     let colors: [UIColor] = [._1, ._2, ._3, ._4, ._5, ._6, ._7, ._8, ._9, ._10, ._11, ._12, ._13, ._14, ._15, ._16, ._17, ._18]
+    
+    // MARK: - Private Properties
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
     private var selectedCategory: TrackerCategory?
    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setUpViewController()
-    }
-    
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.text = "Новое нерегулярное событие"
@@ -42,11 +40,6 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         textField.returnKeyType = .done
         return textField
     }()
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
     
     private lazy var tableView: UITableView = {
         var tableView = UITableView(frame: .zero, style: .plain)
@@ -76,30 +69,14 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         saveButton.setTitle("Создать", for: .normal)
         saveButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.whiteYP, for: .normal)
-        saveButton.backgroundColor = .blackYP
+        saveButton.backgroundColor = .grayYP
+        saveButton.isEnabled = false
         saveButton.layer.cornerRadius = 16
         view.addSubview(saveButton)
         saveButton.translatesAutoresizingMaskIntoConstraints = false
         saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
         return saveButton
     }()
-    
-    @objc
-    private func saveButtonTapped(){
-        let newTracker = Tracker(id: UUID(),
-                                 title: textField.text ?? "",
-                                 color: selectedColor ?? .clear,
-                                 emoji: selectedEmoji ?? "",
-                                 schedule: selectedDays,
-                                 type: .oneTimeEvent)
-        
-        delegate?.didCreateNewIrregularEvent(newTracker, selectedCategory?.title ?? "")
-        
-        if let rootViewController = self.view.window?.rootViewController{
-            rootViewController.dismiss(animated: true)
-        }
-        
-    }
     
     private lazy var cancelButton: UIButton = {
         var cancelButton = UIButton(type: .custom)
@@ -114,13 +91,6 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         return cancelButton
     }()
-    
-    @objc
-    private func cancelButtonTapped(){
-        if let rootViewController = self.view.window?.rootViewController{
-            rootViewController.dismiss(animated: true)
-        }
-    }
     
     private lazy var emojiCollectionView: UICollectionView = {
         var emojiCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -162,11 +132,46 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         return contentView
     }()
     
-    func setUpViewController(){
-        view.backgroundColor = .whiteYP
+    // MARK: - View Life Cycles
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setUpViewController()
+    }
+    
+    // MARK: - Public methods
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        checkDataForButton()
+    }
+    
+    func checkDataForButton(){
+        let isEmojiSelected = selectedEmoji != nil
+        let isColorSelected = selectedColor != nil
+        let isTextFieldFilled = !(textField.text?.isEmpty ?? true)
+        
+        let allFieldsValid = isEmojiSelected && isColorSelected && isTextFieldFilled
+        if allFieldsValid {
+            saveButton.isEnabled = true
+            saveButton.backgroundColor = .blackYP
+        }
+    }
+    
+    func addSubviews()  {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
-        
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(textField)
+        contentView.addSubview(tableView)
+        contentView.addSubview(emojiCollectionView)
+        contentView.addSubview(colorCollectionView)
+        contentView.addSubview(stackView)
+    }
+    
+    func addConstraints() {
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -179,13 +184,6 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
-        
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(textField)
-        contentView.addSubview(tableView)
-        contentView.addSubview(emojiCollectionView)
-        contentView.addSubview(colorCollectionView)
-        contentView.addSubview(stackView)
         
         NSLayoutConstraint.activate([
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
@@ -218,8 +216,40 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -40)
         ])
     }
+    
+    func setUpViewController(){
+        view.backgroundColor = .whiteYP
+        addSubviews()
+        addConstraints()
+    }
+
+    // MARK: - Private methods
+    @objc
+    private func saveButtonTapped(){
+        let newTracker = Tracker(id: UUID(),
+                                 title: textField.text ?? "",
+                                 color: selectedColor ?? .clear,
+                                 emoji: selectedEmoji ?? "",
+                                 schedule: selectedDays,
+                                 type: .oneTimeEvent)
+        
+        delegate?.didCreateNewIrregularEvent(newTracker, selectedCategory?.title ?? "")
+        
+        if let rootViewController = self.view.window?.rootViewController{
+            rootViewController.dismiss(animated: true)
+        }
+        
+    }
+    
+    @objc
+    private func cancelButtonTapped(){
+        if let rootViewController = self.view.window?.rootViewController{
+            rootViewController.dismiss(animated: true)
+        }
+    }
 }
 
+// MARK: - UITableViewDataSource
 extension NewIrregularEventViewController: UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableInformation.count
@@ -236,6 +266,7 @@ extension NewIrregularEventViewController: UITableViewDataSource{
     }
 }
 
+// MARK: - UITableViewDelegate
 extension NewIrregularEventViewController: UITableViewDelegate{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0{
@@ -325,6 +356,7 @@ extension NewIrregularEventViewController: UICollectionViewDelegateFlowLayout{
                 selectedEmoji = emojis[indexPath.item]
                 cell.layer.cornerRadius = 16
                 cell.backgroundColor = .backgroundYP
+                checkDataForButton()
             }
         }else if collectionView == colorCollectionView{
             if let cell = collectionView.cellForItem(at: indexPath){
@@ -332,6 +364,7 @@ extension NewIrregularEventViewController: UICollectionViewDelegateFlowLayout{
                 cell.layer.borderWidth = 3
                 cell.layer.cornerRadius = 8
                 cell.layer.borderColor = selectedColor?.withAlphaComponent(0.3).cgColor
+                checkDataForButton()
             }
         }
     }

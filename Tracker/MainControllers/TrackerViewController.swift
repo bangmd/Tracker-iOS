@@ -1,33 +1,16 @@
 import UIKit
 
 final class TrackerViewController: UIViewController, AddNewTrackerViewControllerDelegate{
+    // MARK: - Public Properties
     var categories: [TrackerCategory] = []
     var completedTrackers = Set<TrackerRecord>()
     var filteredCategories: [TrackerCategory] = []
     var currentDate = Date()
-    
     let trackerStore = TrackerStore()
     let trackerCategoryStore = TrackerCategoryStore()
     let trackerRecordStore = TrackerRecordStore()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configView()
-        fetchCategory()
-        fetchCompletedTrackers()
-        filteredTracker(for: currentDate)
-        updateStubUI()
-        collectionView.reloadData()
-    }
-    
-    func configView(){
-        view.backgroundColor = .whiteYP
-        addCollectionViewConstraints()
-        addPlusLogo()
-        addTitleLabelToView()
-        addDatePicker()
-    }
-    
+    // MARK: - Private Properties
     private lazy var collectionView: UICollectionView = {
         var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         view.addSubview(collectionView)
@@ -44,6 +27,49 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         return collectionView
     }()
     
+    private var datePicker: UIDatePicker = {
+        var datePicker = UIDatePicker()
+        datePicker.preferredDatePickerStyle = .compact
+        datePicker.datePickerMode = .date
+        datePicker.date = Date()
+        return datePicker
+    }()
+    
+    private var stubImageView: UIImageView = {
+        var stubImageView = UIImageView(image: UIImage(named: "stubImage"))
+        stubImageView.translatesAutoresizingMaskIntoConstraints = false
+        return stubImageView
+    }()
+    
+    private var stubLabel: UILabel = {
+        var stubLabel = UILabel()
+        stubLabel.text = "Что будем отслеживать?"
+        stubLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        stubLabel.textColor = .blackYP
+        stubLabel.translatesAutoresizingMaskIntoConstraints = false
+        return stubLabel
+    }()
+    
+    // MARK: - View Life Cycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configView()
+        fetchCategory()
+        fetchCompletedTrackers()
+        filteredTracker(for: currentDate)
+        updateStubUI()
+        collectionView.reloadData()
+    }
+    
+    // MARK: - Public Methods
+    func configView(){
+        view.backgroundColor = .whiteYP
+        addCollectionViewConstraints()
+        addPlusLogo()
+        addTitleLabelToView()
+        addDatePicker()
+    }
+    
     func addCollectionViewConstraints(){
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.topAnchor, constant: 153),
@@ -52,14 +78,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
-    
-    private var datePicker: UIDatePicker = {
-        var datePicker = UIDatePicker()
-        datePicker.preferredDatePickerStyle = .compact
-        datePicker.datePickerMode = .date
-        datePicker.date = Date()
-        return datePicker
-    }()
     
     func addDatePicker(){
         view.addSubview(datePicker)
@@ -104,41 +122,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         collectionView.reloadData()
     }
     
-    @objc
-    func datePickerValueChanged(_ sender: UIDatePicker){
-        let selectedDate = sender.date
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM.yyyy"
-        let formattedDate = dateFormatter.string(from: selectedDate)
-        filteredTracker(for: selectedDate)
-        collectionView.reloadData()
-        updateStubUI()
-    }
-    
-    func addTracker(_ tracker: Tracker, _ categoryName: String){
-        var newCategories = categories
-        if let index = newCategories.firstIndex(where: { $0.title == categoryName }) {
-            newCategories[index].trackers.append(tracker)
-        }else{
-            let newCategory = TrackerCategory(title: categoryName, trackers: [tracker])
-            newCategories.append(newCategory)
-        }
-        categories = newCategories
-    }
-    
-    func addPlusLogo(){
-        let plusButton = UIButton(type: .custom)
-        plusButton.setImage(UIImage(named: "plusLogo"), for: .normal)
-        plusButton.tintColor = .blackYP
-        plusButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(plusButton)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: plusButton)
-        
-        plusButton.heightAnchor.constraint(equalToConstant: 18).isActive = true
-        plusButton.widthAnchor.constraint(equalToConstant: 19).isActive = true
-        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
-    }
-    
     func didAddNewTracker(_ tracker: Tracker, _ category: String) {
         if trackerCategoryStore.fetchAllCategories().filter({ $0.title == category}).count == 0 {
             let newCategory = TrackerCategory(title: category, trackers: [])
@@ -151,6 +134,62 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         filteredTracker(for: datePicker.date)
         collectionView.reloadData()
         updateStubUI()
+    }
+    
+    func addStubItem(){
+        view.addSubview(stubImageView)
+        view.addSubview(stubLabel)
+        
+        NSLayoutConstraint.activate([
+            stubImageView.widthAnchor.constraint(equalToConstant: 80),
+            stubImageView.heightAnchor.constraint(equalToConstant: 80),
+            stubImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stubImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            stubLabel.topAnchor.constraint(equalTo: stubImageView.bottomAnchor, constant: 8),
+            stubLabel.centerXAnchor.constraint(equalTo: stubImageView.centerXAnchor)
+        ])
+    }
+    
+    func formatDate(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        return dateFormatter.string(from: date)
+    }
+    
+    // MARK: - Private Methods
+    @objc
+    private func datePickerValueChanged(_ sender: UIDatePicker){
+        let selectedDate = sender.date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        let formattedDate = dateFormatter.string(from: selectedDate)
+        filteredTracker(for: selectedDate)
+        collectionView.reloadData()
+        updateStubUI()
+    }
+    
+    private func addTracker(_ tracker: Tracker, _ categoryName: String){
+        var newCategories = categories
+        if let index = newCategories.firstIndex(where: { $0.title == categoryName }) {
+            newCategories[index].trackers.append(tracker)
+        }else{
+            let newCategory = TrackerCategory(title: categoryName, trackers: [tracker])
+            newCategories.append(newCategory)
+        }
+        categories = newCategories
+    }
+    
+    private func addPlusLogo(){
+        let plusButton = UIButton(type: .custom)
+        plusButton.setImage(UIImage(named: "plusLogo"), for: .normal)
+        plusButton.tintColor = .blackYP
+        plusButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(plusButton)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: plusButton)
+        
+        plusButton.heightAnchor.constraint(equalToConstant: 18).isActive = true
+        plusButton.widthAnchor.constraint(equalToConstant: 19).isActive = true
+        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
     }
     
     private func fetchCategory() {
@@ -170,13 +209,13 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     }
     
     @objc
-    func plusButtonTapped(){
+    private func plusButtonTapped(){
         let newTrackerViewController = AddNewTrackerViewController()
         newTrackerViewController.delegate = self
         present(newTrackerViewController, animated: true, completion: nil)
     }
     
-    func addTitleLabelToView(){
+    private func addTitleLabelToView(){
         let titleLabel = UILabel()
         titleLabel.text = "Трекеры"
         titleLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)
@@ -185,35 +224,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         view.addSubview(titleLabel)
         titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-    }
-    
-    private var stubImageView: UIImageView = {
-        var stubImageView = UIImageView(image: UIImage(named: "stubImage"))
-        stubImageView.translatesAutoresizingMaskIntoConstraints = false
-        return stubImageView
-    }()
-    
-    private var stubLabel: UILabel = {
-        var stubLabel = UILabel()
-        stubLabel.text = "Что будем отслеживать?"
-        stubLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        stubLabel.textColor = .blackYP
-        stubLabel.translatesAutoresizingMaskIntoConstraints = false
-        return stubLabel
-    }()
-    
-    func addStubItem(){
-        view.addSubview(stubImageView)
-        view.addSubview(stubLabel)
-        
-        NSLayoutConstraint.activate([
-            stubImageView.widthAnchor.constraint(equalToConstant: 80),
-            stubImageView.heightAnchor.constraint(equalToConstant: 80),
-            stubImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            stubImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stubLabel.topAnchor.constraint(equalTo: stubImageView.bottomAnchor, constant: 8),
-            stubLabel.centerXAnchor.constraint(equalTo: stubImageView.centerXAnchor)
-        ])
     }
     
     private func removeStubItem() {
@@ -228,15 +238,9 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
             removeStubItem()
         }
     }
-    
-    func formatDate(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM.yyyy"
-        return dateFormatter.string(from: date)
-    }
 }
 
-
+// MARK: - UICollectionViewDataSource
 extension TrackerViewController: UICollectionViewDataSource{
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return filteredCategories.count
@@ -290,6 +294,7 @@ extension TrackerViewController: UICollectionViewDataSource{
     }
 }
 
+// MARK: - UICollectionViewDelegateFlowLayout
 extension TrackerViewController: UICollectionViewDelegateFlowLayout{
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
@@ -309,6 +314,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout{
     
 }
 
+// MARK: - TrackerCollectionViewCellProtocol
 extension TrackerViewController: TrackerCollectionViewCellProtocol{
     func didTapPlusButton(in cell: TrackerCollectionViewCell) {
         let selectedDate = datePicker.date

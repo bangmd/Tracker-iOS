@@ -5,7 +5,6 @@ protocol AddNewTrackerViewControllerDelegate: AnyObject {
 }
 
 final class AddNewTrackerViewController: UIViewController, NewHabitViewControllerDelegate, NewIrregularEventViewControllerDelegate{
-    
     weak var delegate: AddNewTrackerViewControllerDelegate?
     
     override func viewDidLoad() {
@@ -20,7 +19,7 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
         addIrregularEventButton()
     }
     
-    func addTitle(){
+    private func addTitle(){
         let label = UILabel()
         label.text = "Создание трекера"
         label.textColor = .blackYP
@@ -35,7 +34,7 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
         ])
     }
     
-    func addHabitButton(){
+    private func addHabitButton(){
         let habitButton = UIButton(type: .custom)
         habitButton.setTitle("Привычка", for: .normal)
         habitButton.backgroundColor = .blackYP
@@ -67,13 +66,13 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
     }
     
     @objc
-    func habitButtonTapped(){
+    private func habitButtonTapped(){
         let newHabitViewController = NewHabitViewController()
         newHabitViewController.delegate = self
         present(newHabitViewController, animated: true)
     }
     
-    func addIrregularEventButton(){
+    private func addIrregularEventButton(){
         let irregularEventButton = UIButton(type: .custom)
         irregularEventButton.setTitle("Нерегулярные событие", for: .normal)
         irregularEventButton.backgroundColor = .blackYP
@@ -97,7 +96,7 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
     }
     
     @objc
-    func irregularEventButtonTapped(){
+    private func irregularEventButtonTapped(){
         let newIrregularEventViewController = NewIrregularEventViewController()
         newIrregularEventViewController.delegate = self
         present(newIrregularEventViewController, animated: true)

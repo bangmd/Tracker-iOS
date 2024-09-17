@@ -4,20 +4,24 @@ protocol NewHabitViewControllerDelegate: AnyObject{
     func didCreateNewTracker(_ tracker: Tracker, _ category: String)
 }
 
-final class NewHabitViewController: UIViewController, UITextFieldDelegate{
+protocol ViewSetupProtocol {
+    func addSubviews()
+    func addConstraints()
+}
+
+final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewSetupProtocol{
+    // MARK: - Public Properties
     let tableInformation = ["Категория", "Расписание"]
     var selectedDays: Set<DayOfWeeks> = []
     weak var delegate: NewHabitViewControllerDelegate?
     let emojis = ["😊", "😍", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
     let colors: [UIColor] = [._1, ._2, ._3, ._4, ._5, ._6, ._7, ._8, ._9, ._10, ._11, ._12, ._13, ._14, ._15, ._16, ._17, ._18]
+    
+    // MARK: - Private Properties
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
     private var selectedCategory: TrackerCategory?
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setUpViewController()
-    }
+    private var selectedDaysString: String = ""
     
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
@@ -42,11 +46,6 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
         textField.returnKeyType = .done
         return textField
     }()
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
     
     private lazy var tableView: UITableView = {
         var tableView = UITableView(frame: .zero, style: .plain)
@@ -82,35 +81,18 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
     }()
     
     private lazy var saveButton: UIButton = {
-        var saveButton = UIButton(type: .custom)
+        var saveButton = UIButton(type: .system)
         saveButton.setTitle("Создать", for: .normal)
         saveButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.whiteYP, for: .normal)
-        saveButton.backgroundColor = .blackYP
+        saveButton.isEnabled = false
+        saveButton.backgroundColor = saveButton.isEnabled ? .blackYP : .grayYP
         saveButton.layer.cornerRadius = 16
         view.addSubview(saveButton)
         saveButton.translatesAutoresizingMaskIntoConstraints = false
         saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
         return saveButton
     }()
-    
-    @objc
-    private func saveButtonTapped(){
-        let newTracker = Tracker(id: UUID(),
-                                 title: textField.text ?? "",
-                                 color: selectedColor ?? .clear,
-                                 emoji: selectedEmoji ?? "",
-                                 schedule: selectedDays,
-                                 type: .habit)
-        
-        delegate?.didCreateNewTracker(newTracker, selectedCategory?.title ?? "")
-        
-        if let rootViewController = self.view.window?.rootViewController{
-            rootViewController.dismiss(animated: true)
-        }
-    }
-    
-    
     
     private lazy var cancelButton: UIButton = {
         var cancelButton = UIButton(type: .custom)
@@ -126,19 +108,12 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
         return cancelButton
     }()
     
-    @objc
-    private func cancelButtonTapped(){
-        if let rootViewController = self.view.window?.rootViewController{
-            rootViewController.dismiss(animated: true)
-        }
-    }
-    
     private lazy var emojiCollectionView: UICollectionView = {
         var emojiCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         emojiCollectionView.isScrollEnabled = false
         emojiCollectionView.backgroundColor = .none
         emojiCollectionView.register(EmojiCollectionViewCell.self, forCellWithReuseIdentifier: "emojiCell")
-        emojiCollectionView.register(EmojiHeaderCollectionView.self, 
+        emojiCollectionView.register(EmojiHeaderCollectionView.self,
                                      forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                      withReuseIdentifier: "header")
         emojiCollectionView.dataSource = self
@@ -161,7 +136,6 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
         return colorCollectionView
     }()
     
-    
     private lazy var scrollView: UIScrollView = {
         var scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -174,11 +148,35 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
         return contentView
     }()
     
-    func setUpViewController(){
-        view.backgroundColor = .whiteYP
+    // MARK: - View Life Cycles
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setUpViewController()
+    }
+    
+    // MARK: - Public methods
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        checkDataForButton()
+    }
+    
+    func addSubviews() {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
 
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(textField)
+        contentView.addSubview(tableView)
+        contentView.addSubview(emojiCollectionView)
+        contentView.addSubview(colorCollectionView)
+        contentView.addSubview(stackView)
+    }
+    
+    func addConstraints() {
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -192,12 +190,6 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
         
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(textField)
-        contentView.addSubview(tableView)
-        contentView.addSubview(emojiCollectionView)
-        contentView.addSubview(colorCollectionView)
-        contentView.addSubview(stackView)
         NSLayoutConstraint.activate([
             titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 27),
@@ -229,8 +221,52 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate{
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -40)
         ])
     }
+    
+    func setUpViewController(){
+        view.backgroundColor = .whiteYP
+        addSubviews()
+        addConstraints()
+    }
+    
+    func checkDataForButton(){
+        let isEmojiSelected = selectedEmoji != nil
+        let isColorSelected = selectedColor != nil
+        let areDaysSelected = !selectedDays.isEmpty
+        let isTextFieldFilled = !(textField.text?.isEmpty ?? true)
+        
+        let allFieldsValid = isEmojiSelected && isColorSelected && areDaysSelected && isTextFieldFilled
+        if allFieldsValid {
+            saveButton.isEnabled = true
+            saveButton.backgroundColor = .blackYP
+        }
+    }
+    
+    // MARK: - Private Methods
+    @objc
+    private func saveButtonTapped(){
+        let newTracker = Tracker(id: UUID(),
+                                 title: textField.text ?? "",
+                                 color: selectedColor ?? .whiteYP,
+                                 emoji: selectedEmoji ?? "",
+                                 schedule: selectedDays,
+                                 type: .habit)
+        
+        delegate?.didCreateNewTracker(newTracker, selectedCategory?.title ?? "")
+        
+        if let rootViewController = self.view.window?.rootViewController{
+            rootViewController.dismiss(animated: true)
+        }
+    }
+    
+    @objc
+    private func cancelButtonTapped(){
+        if let rootViewController = self.view.window?.rootViewController{
+            rootViewController.dismiss(animated: true)
+        }
+    }
 }
 
+// MARK: - UITableViewDataSource
 extension NewHabitViewController: UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableInformation.count
@@ -240,13 +276,37 @@ extension NewHabitViewController: UITableViewDataSource{
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? TrackerTableCell else {
             return TrackerTableCell()
         }
-        cell.selectionStyle = .none
-        cell.configCell(text: tableInformation[indexPath.row], image: UIImage(named: "backward"))
+        
+        if cell.secondLabel.isHidden == true{
+            cell.selectionStyle = .none
+            cell.configCell(text: tableInformation[indexPath.row], image: UIImage(named: "backward"))
+        } else {
+            cell.selectionStyle = .none
+            
+            let sortedSelectedDays = selectedDays.sorted {
+                guard let firstIndex = DayOfWeeks.allCases.firstIndex(of: $0),
+                      let secondIndex = DayOfWeeks.allCases.firstIndex(of: $1) else {
+                    return false
+                }
+                return firstIndex < secondIndex
+            }
+            
+            var secondText = ""
+            
+            if sortedSelectedDays.count >= 7{
+                secondText = "Каждый день"
+            } else {
+                secondText  = sortedSelectedDays.map({ $0.shortName }).joined(separator: ", ")
+            }
+            
+            cell.configCell(text: tableInformation[indexPath.row], secondText: secondText, image: UIImage(named: "backward"))
+        }
         
         return cell
     }
 }
 
+// MARK: - UITableViewDelegate
 extension NewHabitViewController: UITableViewDelegate{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0{
@@ -260,9 +320,14 @@ extension NewHabitViewController: UITableViewDelegate{
     }
 }
 
+// MARK: - ScheduleViewControllerProtocol
 extension NewHabitViewController: ScheduleViewControllerProtocol{
     func didUpdateSelectedDays(_ selectedDays: Set<DayOfWeeks>) {
         self.selectedDays = selectedDays
+        let cell = tableView.cellForRow(at: IndexPath(row: 1, section: 0)) as? TrackerTableCell
+        cell?.showSecondLabel()
+        tableView.reloadData()
+        checkDataForButton()
     }
 }
 
@@ -346,6 +411,7 @@ extension NewHabitViewController: UICollectionViewDelegateFlowLayout{
                 selectedEmoji = emojis[indexPath.item]
                 cell.layer.cornerRadius = 16
                 cell.backgroundColor = .backgroundYP
+                checkDataForButton()
             }
         }else if collectionView == colorCollectionView{
             if let cell = collectionView.cellForItem(at: indexPath){
@@ -353,6 +419,7 @@ extension NewHabitViewController: UICollectionViewDelegateFlowLayout{
                 cell.layer.borderWidth = 3
                 cell.layer.cornerRadius = 8
                 cell.layer.borderColor = selectedColor?.withAlphaComponent(0.3).cgColor
+                checkDataForButton()
             }
         }
     }

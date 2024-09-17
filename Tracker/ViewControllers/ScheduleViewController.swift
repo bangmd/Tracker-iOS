@@ -8,6 +8,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate{
     private let weekDays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье",]
     private var daySelection = DaySelection()
     weak var delegate: ScheduleViewControllerProtocol?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpViewController()
@@ -67,7 +68,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate{
     }
     
     @objc
-    func DoneButtonTapped(){
+    private func DoneButtonTapped(){
         let newHabitViewController = NewHabitViewController()
         dismiss(animated: true)
         delegate?.didUpdateSelectedDays(daySelection.selectedDays)
@@ -108,7 +109,7 @@ extension ScheduleViewController: UITableViewDataSource{
     }
     
     @objc
-    func switchChanged(_ sender: UISwitch){
+    private func switchChanged(_ sender: UISwitch){
         let day = DayOfWeeks.allCases[sender.tag]
         daySelection.toggleSelection(for: day)
     }
