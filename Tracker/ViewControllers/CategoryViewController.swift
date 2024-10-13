@@ -102,7 +102,7 @@ final class CategoryViewController: UIViewController{
 //    }
     
     @objc
-    func newCategoryButtonTapped(){
+    private func newCategoryButtonTapped(){
         //let newHabitViewController = NewHabitViewController()
        //newHabitViewController.delegate = self
         //present(newHabitViewController, animated: true)

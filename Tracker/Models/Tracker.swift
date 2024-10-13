@@ -1,11 +1,11 @@
 import UIKit
 
-enum TrackerType{
-    case habit
-    case oneTimeEvent
+enum TrackerType: String{
+    case habit = "Habit"
+    case oneTimeEvent = "OneTimeEvent"
 }
 
-enum DayOfWeeks: String, CaseIterable{
+enum DayOfWeeks: String, Codable, CaseIterable{
     case monday = "Понедельник"
     case tuesday = "Вторник"
     case wednesday = "Среда"
@@ -13,6 +13,25 @@ enum DayOfWeeks: String, CaseIterable{
     case friday = "Пятница"
     case saturday = "Суббота"
     case sunday = "Воскресенье"
+    
+    var shortName: String{
+        switch self{
+        case .monday: 
+            return "Пн"
+        case .tuesday:
+            return "Вт"
+        case .wednesday:
+            return "Ср"
+        case .thursday:
+            return "Чт"
+        case .friday:
+            return "Пт"
+        case .saturday:
+            return "Сб"
+        case .sunday:
+            return "Вс"
+        }
+    }
 }
 
 extension DayOfWeeks {

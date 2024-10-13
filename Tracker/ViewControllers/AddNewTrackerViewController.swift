@@ -1,7 +1,7 @@
 import UIKit
 
 protocol AddNewTrackerViewControllerDelegate: AnyObject {
-    func didAddNewTracker(tracker: Tracker)
+    func didAddNewTracker(_ tracker: Tracker, _ category: String)
 }
 
 final class AddNewTrackerViewController: UIViewController, NewHabitViewControllerDelegate, NewIrregularEventViewControllerDelegate{
@@ -19,10 +19,10 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
         addIrregularEventButton()
     }
     
-    func addTitle(){
+    private func addTitle(){
         let label = UILabel()
         label.text = "Создание трекера"
-        label.textColor = .black
+        label.textColor = .blackYP
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         
         view.addSubview(label)
@@ -34,12 +34,13 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
         ])
     }
     
-    func addHabitButton(){
+    private func addHabitButton(){
         let habitButton = UIButton(type: .custom)
         habitButton.setTitle("Привычка", for: .normal)
         habitButton.backgroundColor = .blackYP
         habitButton.layer.cornerRadius = 16
         habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        habitButton.setTitleColor(.whiteYP, for: .normal)
         habitButton.titleLabel?.textAlignment = .center
         
         view.addSubview(habitButton)
@@ -56,27 +57,28 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
         habitButton.addTarget(self, action: #selector(habitButtonTapped), for: .touchUpInside)
     }
     
-    func didCreateNewTracker(tracker: Tracker) {
-        delegate?.didAddNewTracker(tracker: tracker)
+    func didCreateNewTracker(_ tracker: Tracker, _ category: String) {
+        delegate?.didAddNewTracker(tracker, category)
     }
     
-    func didCreateNewIrregularEvent(tracker: Tracker) {
-        delegate?.didAddNewTracker(tracker: tracker)
+    func didCreateNewIrregularEvent(_ tracker: Tracker, _ category: String) {
+        delegate?.didAddNewTracker(tracker, category)
     }
     
     @objc
-    func habitButtonTapped(){
+    private func habitButtonTapped(){
         let newHabitViewController = NewHabitViewController()
         newHabitViewController.delegate = self
         present(newHabitViewController, animated: true)
     }
     
-    func addIrregularEventButton(){
+    private func addIrregularEventButton(){
         let irregularEventButton = UIButton(type: .custom)
         irregularEventButton.setTitle("Нерегулярные событие", for: .normal)
         irregularEventButton.backgroundColor = .blackYP
         irregularEventButton.layer.cornerRadius = 16
         irregularEventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        irregularEventButton.setTitleColor(.whiteYP, for: .normal)
         irregularEventButton.titleLabel?.textAlignment = .center
         
         view.addSubview(irregularEventButton)
@@ -94,7 +96,7 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
     }
     
     @objc
-    func irregularEventButtonTapped(){
+    private func irregularEventButtonTapped(){
         let newIrregularEventViewController = NewIrregularEventViewController()
         newIrregularEventViewController.delegate = self
         present(newIrregularEventViewController, animated: true)

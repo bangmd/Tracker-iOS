@@ -7,6 +7,7 @@ protocol TrackerCollectionViewCellProtocol: AnyObject{
 final class TrackerCollectionViewCell: UICollectionViewCell{
     weak var delegate: TrackerCollectionViewCellProtocol?
     var tracker: Tracker?
+    var indexPath: IndexPath?
     
     override init(frame: CGRect) {
         super.init(frame: frame)

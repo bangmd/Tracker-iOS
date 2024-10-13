@@ -1,25 +1,16 @@
 import UIKit
 
 final class TrackerViewController: UIViewController, AddNewTrackerViewControllerDelegate{
+    // MARK: - Public Properties
     var categories: [TrackerCategory] = []
     var completedTrackers = Set<TrackerRecord>()
     var filteredCategories: [TrackerCategory] = []
     var currentDate = Date()
+    let trackerStore = TrackerStore()
+    let trackerCategoryStore = TrackerCategoryStore()
+    let trackerRecordStore = TrackerRecordStore()
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        configView()
-        addStubItem()
-    }
-    
-    func configView(){
-        view.backgroundColor = .whiteYP
-        addCollectionViewConstraints()
-        addPlusLogo()
-        addTitleLabelToView()
-        addDatePicker()
-    }
-    
+    // MARK: - Private Properties
     private lazy var collectionView: UICollectionView = {
         var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         view.addSubview(collectionView)
@@ -36,6 +27,49 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         return collectionView
     }()
     
+    private var datePicker: UIDatePicker = {
+        var datePicker = UIDatePicker()
+        datePicker.preferredDatePickerStyle = .compact
+        datePicker.datePickerMode = .date
+        datePicker.date = Date()
+        return datePicker
+    }()
+    
+    private var stubImageView: UIImageView = {
+        var stubImageView = UIImageView(image: UIImage(named: "stubImage"))
+        stubImageView.translatesAutoresizingMaskIntoConstraints = false
+        return stubImageView
+    }()
+    
+    private var stubLabel: UILabel = {
+        var stubLabel = UILabel()
+        stubLabel.text = "Что будем отслеживать?"
+        stubLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        stubLabel.textColor = .blackYP
+        stubLabel.translatesAutoresizingMaskIntoConstraints = false
+        return stubLabel
+    }()
+    
+    // MARK: - View Life Cycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configView()
+        fetchCategory()
+        fetchCompletedTrackers()
+        filteredTracker(for: currentDate)
+        updateStubUI()
+        collectionView.reloadData()
+    }
+    
+    // MARK: - Public Methods
+    func configView(){
+        view.backgroundColor = .whiteYP
+        addCollectionViewConstraints()
+        addPlusLogo()
+        addTitleLabelToView()
+        addDatePicker()
+    }
+    
     func addCollectionViewConstraints(){
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.topAnchor, constant: 153),
@@ -44,14 +78,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
-    
-    private var datePicker: UIDatePicker = {
-        var datePicker = UIDatePicker()
-        datePicker.preferredDatePickerStyle = .compact
-        datePicker.datePickerMode = .date
-        datePicker.date = Date()
-        return datePicker
-    }()
     
     func addDatePicker(){
         view.addSubview(datePicker)
@@ -92,87 +118,23 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
                 filteredCategories.append(TrackerCategory(title: category.title, trackers: filteredTrackers))
             }
         }
-        
         self.filteredCategories = filteredCategories
         collectionView.reloadData()
     }
     
-    
-    @objc
-    func datePickerValueChanged(_ sender: UIDatePicker){
-        let selectedDate = sender.date
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM.yyyy"
-        let formattedDate = dateFormatter.string(from: selectedDate)
-        filteredTracker(for: selectedDate)
-        collectionView.reloadData()
-        updateStubUI()
-    }
-    
-    func addTracker(_ tracker: Tracker, _ categoryName: String){
-        var newCategories = categories
-        if let index = newCategories.firstIndex(where: { $0.title == categoryName }) {
-            newCategories[index].trackers.append(tracker)
-        }else{
-            let newCategory = TrackerCategory(title: categoryName, trackers: [tracker])
-            newCategories.append(newCategory)
+    func didAddNewTracker(_ tracker: Tracker, _ category: String) {
+        if trackerCategoryStore.fetchAllCategories().filter({ $0.title == category}).count == 0 {
+            let newCategory = TrackerCategory(title: category, trackers: [])
+            trackerCategoryStore.createCategory(newCategory)
         }
-        categories = newCategories
-    }
-    
-    
-    func addPlusLogo(){
-        let plusButton = UIButton(type: .custom)
-        plusButton.setImage(UIImage(named: "plusLogo"), for: .normal)
-        plusButton.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(plusButton)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: plusButton)
         
-        plusButton.heightAnchor.constraint(equalToConstant: 18).isActive = true
-        plusButton.widthAnchor.constraint(equalToConstant: 19).isActive = true
-        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
-    }
+        createCategoryAndTracker(tracker: tracker, with: category)
+        fetchCategory()
     
-    func didAddNewTracker(tracker: Tracker) {
-        addTracker(tracker, "Health")
         filteredTracker(for: datePicker.date)
         collectionView.reloadData()
         updateStubUI()
     }
-    
-    @objc
-    func plusButtonTapped(){
-        let newTrackerViewController = AddNewTrackerViewController()
-        newTrackerViewController.delegate = self
-        present(newTrackerViewController, animated: true, completion: nil)
-    }
-    
-    func addTitleLabelToView(){
-        let titleLabel = UILabel()
-        titleLabel.text = "Трекеры"
-        titleLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)
-        titleLabel.textColor = .blackYP
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(titleLabel)
-        titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
-        titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-    }
-    
-    private var stubImageView: UIImageView = {
-        var stubImageView = UIImageView(image: UIImage(named: "stubImage"))
-        stubImageView.translatesAutoresizingMaskIntoConstraints = false
-        return stubImageView
-    }()
-    
-    
-    private var stubLabel: UILabel = {
-        var stubLabel = UILabel()
-        stubLabel.text = "Что будем отслеживать?"
-        stubLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        stubLabel.textColor = .blackYP
-        stubLabel.translatesAutoresizingMaskIntoConstraints = false
-        return stubLabel
-    }()
     
     func addStubItem(){
         view.addSubview(stubImageView)
@@ -188,6 +150,82 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         ])
     }
     
+    func formatDate(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        return dateFormatter.string(from: date)
+    }
+    
+    // MARK: - Private Methods
+    @objc
+    private func datePickerValueChanged(_ sender: UIDatePicker){
+        let selectedDate = sender.date
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        let formattedDate = dateFormatter.string(from: selectedDate)
+        filteredTracker(for: selectedDate)
+        collectionView.reloadData()
+        updateStubUI()
+    }
+    
+    private func addTracker(_ tracker: Tracker, _ categoryName: String){
+        var newCategories = categories
+        if let index = newCategories.firstIndex(where: { $0.title == categoryName }) {
+            newCategories[index].trackers.append(tracker)
+        }else{
+            let newCategory = TrackerCategory(title: categoryName, trackers: [tracker])
+            newCategories.append(newCategory)
+        }
+        categories = newCategories
+    }
+    
+    private func addPlusLogo(){
+        let plusButton = UIButton(type: .custom)
+        plusButton.setImage(UIImage(named: "plusLogo"), for: .normal)
+        plusButton.tintColor = .blackYP
+        plusButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(plusButton)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: plusButton)
+        
+        plusButton.heightAnchor.constraint(equalToConstant: 18).isActive = true
+        plusButton.widthAnchor.constraint(equalToConstant: 19).isActive = true
+        plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
+    }
+    
+    private func fetchCategory() {
+        let coreDataCategories = trackerCategoryStore.fetchAllCategories()
+        categories = coreDataCategories.compactMap { coreDataCategory in
+            let decodedCategory = trackerCategoryStore.decodingCategory(from: coreDataCategory)
+            return decodedCategory
+        }
+    }
+
+    private func fetchCompletedTrackers(){
+        completedTrackers = trackerRecordStore.fetchAllCompletedTrackers()
+    }
+    
+    private func createCategoryAndTracker(tracker: Tracker, with titleCategory: String) {
+        trackerCategoryStore.createCategoryAndTracker(tracker: tracker, with: titleCategory)
+    }
+    
+    @objc
+    private func plusButtonTapped(){
+        let newTrackerViewController = AddNewTrackerViewController()
+        newTrackerViewController.delegate = self
+        present(newTrackerViewController, animated: true, completion: nil)
+    }
+    
+    private func addTitleLabelToView(){
+        let titleLabel = UILabel()
+        titleLabel.text = "Трекеры"
+        titleLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)
+        titleLabel.textColor = .blackYP
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(titleLabel)
+        titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
+        titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
+    }
+    
     private func removeStubItem() {
         stubImageView.removeFromSuperview()
         stubLabel.removeFromSuperview()
@@ -200,16 +238,9 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
             removeStubItem()
         }
     }
-    
-    func formatDate(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd.MM.yyyy"
-        return dateFormatter.string(from: date)
-    }
-    
 }
 
-
+// MARK: - UICollectionViewDataSource
 extension TrackerViewController: UICollectionViewDataSource{
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return filteredCategories.count
@@ -228,7 +259,11 @@ extension TrackerViewController: UICollectionViewDataSource{
         let category = filteredCategories[indexPath.section]
         let tracker = category.trackers[indexPath.row]
         let record = TrackerRecord(idTracker: tracker.id, date: datePicker.date)
-        let isDone = completedTrackers.contains(record)
+        
+        let isDone = completedTrackers.contains { completedRecord in
+            completedRecord.idTracker == tracker.id && Calendar.current.isDate(completedRecord.date, inSameDayAs: datePicker.date)
+        }
+
         let totalCompletedCount = completedTrackers.filter { $0.idTracker == tracker.id }.count
         
         cell.updateDayCounter(totalCompletedCount: totalCompletedCount)
@@ -259,6 +294,7 @@ extension TrackerViewController: UICollectionViewDataSource{
     }
 }
 
+// MARK: - UICollectionViewDelegateFlowLayout
 extension TrackerViewController: UICollectionViewDelegateFlowLayout{
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
@@ -278,9 +314,9 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout{
     
 }
 
+// MARK: - TrackerCollectionViewCellProtocol
 extension TrackerViewController: TrackerCollectionViewCellProtocol{
     func didTapPlusButton(in cell: TrackerCollectionViewCell) {
-        
         let selectedDate = datePicker.date
         let formattedSelectedDate = formatDate(selectedDate)
         let formattedCurrentDate = formatDate(currentDate)
@@ -294,11 +330,12 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
         let record = TrackerRecord(idTracker: trackerID, date: selectedDate)
         let calendar = Calendar.current
         
-        if completedTrackers.contains(record) {
-            completedTrackers.remove(record)
-            
+        if let existingRecord = completedTrackers.first(where: { $0.idTracker == trackerID && calendar.isDate($0.date, inSameDayAs: selectedDate) }) {
+            completedTrackers.remove(existingRecord)
+            trackerRecordStore.removeRecord(for: existingRecord)
         } else {
             completedTrackers.insert(record)
+            trackerRecordStore.addNewRecord(from: record)
             
             if tracker.type == .oneTimeEvent && calendar.isDate(selectedDate, inSameDayAs: currentDate) {
                 category.trackers.remove(at: indexPath.row)
@@ -311,16 +348,27 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
                     collectionView.deleteItems(at: [indexPath])
                 }
                 
+                if let coreDataTracker = trackerStore.fetchCoreDataTracker(by: tracker.id) {
+                    trackerStore.deleteTracker(coreDataTracker)
+                }
+                
+                if let originalCategoryIndex = categories.firstIndex(where: { $0.title == category.title }) {
+                    categories[originalCategoryIndex].trackers.removeAll(where: { $0.id == tracker.id })
+                    
+                    if categories[originalCategoryIndex].trackers.isEmpty {
+                        categories.remove(at: originalCategoryIndex)
+                    }
+                }
+                            
                 return
             }
         }
         
-        let isDone = completedTrackers.contains(record)
+        let isDone = completedTrackers.contains { $0.idTracker == trackerID && calendar.isDate($0.date, inSameDayAs: selectedDate) }
         let totalCompletedCount = completedTrackers.filter { $0.idTracker == tracker.id }.count
         
         cell.updateDayCounter(totalCompletedCount: totalCompletedCount)
         cell.updateCellStatus(isDone: isDone)
     }
 }
-
 
