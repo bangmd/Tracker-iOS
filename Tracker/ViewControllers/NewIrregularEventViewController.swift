@@ -152,11 +152,15 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         let isEmojiSelected = selectedEmoji != nil
         let isColorSelected = selectedColor != nil
         let isTextFieldFilled = !(textField.text?.isEmpty ?? true)
+        let isCategoryFilled = !(selectedCategory?.title.isEmpty ?? true)
         
-        let allFieldsValid = isEmojiSelected && isColorSelected && isTextFieldFilled
+        let allFieldsValid = isEmojiSelected && isColorSelected && isTextFieldFilled && isCategoryFilled
         if allFieldsValid {
             saveButton.isEnabled = true
             saveButton.backgroundColor = .blackYP
+        }else {
+            saveButton.isEnabled = false
+            saveButton.backgroundColor = .grayYP
         }
     }
     
@@ -262,6 +266,9 @@ extension NewIrregularEventViewController: UITableViewDataSource{
         cell.selectionStyle = .none
         cell.configCell(text: tableInformation[indexPath.row], image: UIImage(named: "backward"))
         
+        let secondText = selectedCategory?.title ?? "Выберите категорию"
+        cell.configCell(text: tableInformation[indexPath.row], secondText: secondText, image: UIImage(named: "backward"))
+        
         return cell
     }
 }
@@ -270,8 +277,17 @@ extension NewIrregularEventViewController: UITableViewDataSource{
 extension NewIrregularEventViewController: UITableViewDelegate{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0{
-            let categoryViewController = CategoryViewController()
+            let categoryViewController = CategoriesViewController(viewModel: CategoriesViewModel())
             present(categoryViewController, animated: true)
+            
+            categoryViewController.onSaveCategory = {[weak self] newCategory in
+                guard let self = self else { return }
+                self.selectedCategory = TrackerCategory(title: newCategory, trackers: [])
+                let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? TrackerTableCell
+                cell?.showSecondLabel()
+                tableView.reloadData()
+                checkDataForButton()
+            }
         }
     }
 }
