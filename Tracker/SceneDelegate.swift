@@ -6,17 +6,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        window = UIWindow(windowScene: windowScene)
         
+        let window = UIWindow(windowScene: windowScene)
         let hasSeenOnboarding = UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasSeenOnboarding)
         
         if hasSeenOnboarding {
-            window?.rootViewController = TabBarViewController()
+            // Если онбординг был показан, показываем главный экран
+            window.rootViewController = TabBarViewController()
         } else {
-            window?.rootViewController = OnboardingPageViewController(transitionStyle: .scroll,                                                                     navigationOrientation: .horizontal,                                                         options: nil)
+            // Если онбординг не был показан, показываем экран онбординга
+            window.rootViewController = OnboardingPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
         }
         
-        window?.makeKeyAndVisible()
+        window.makeKeyAndVisible()
+        self.window = window
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {

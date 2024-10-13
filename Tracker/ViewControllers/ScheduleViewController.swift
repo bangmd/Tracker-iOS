@@ -1,26 +1,15 @@
 import UIKit
 
+// MARK: - ScheduleViewControllerProtocol
 protocol ScheduleViewControllerProtocol: AnyObject{
     func didUpdateSelectedDays(_ selectedDays: Set<DayOfWeeks>)
 }
 
 final class ScheduleViewController: UIViewController, UITableViewDelegate{
+    // MARK: - Private Properties
     private let weekDays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье",]
     private var daySelection = DaySelection()
     weak var delegate: ScheduleViewControllerProtocol?
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setUpViewController()
-    }
-    
-    func setUpViewController(){
-        view.backgroundColor = .whiteYP
-        addTitle()
-        addDoneButton()
-        tableView.layer.masksToBounds = true
-        tableView.layer.cornerRadius = 16
-    }
     
     private lazy var label: UILabel = {
         var label = UILabel()
@@ -32,6 +21,33 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate{
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    private lazy var tableView: UITableView = {
+        var tableView = UITableView(frame: .zero, style: .plain)
+        tableView.backgroundColor = .backgroundYP
+        tableView.isScrollEnabled = false
+        view.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(ScheduleTableViewCell.self, forCellReuseIdentifier: "cell")
+        return tableView
+    }()
+    
+    // MARK: - View Life Cycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setUpViewController()
+    }
+    
+    // MARK: - UI Setup
+    func setUpViewController(){
+        view.backgroundColor = .whiteYP
+        addTitle()
+        addDoneButton()
+        tableView.layer.masksToBounds = true
+        tableView.layer.cornerRadius = 16
+    }
     
     func addTitle(){
         NSLayoutConstraint.activate([
@@ -73,22 +89,9 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate{
         dismiss(animated: true)
         delegate?.didUpdateSelectedDays(daySelection.selectedDays)
     }
-    
-    private lazy var tableView: UITableView = {
-        var tableView = UITableView(frame: .zero, style: .plain)
-        tableView.backgroundColor = .backgroundYP
-        tableView.isScrollEnabled = false
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.register(ScheduleTableViewCell.self, forCellReuseIdentifier: "cell")
-        return tableView
-    }()
-    
 }
 
-
+// MARK: - UITableViewDataSource
 extension ScheduleViewController: UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return DayOfWeeks.allCases.count

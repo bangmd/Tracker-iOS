@@ -70,9 +70,13 @@ final class OnboardingViewController: UIViewController{
     // MARK: - Private Methods
     @objc
     private func actionButtonDidTapped(){
-        UserDefaults.standard.setValue(true, forKey: UserDefaultsKeys.hasSeenOnboarding)
-        let tabBarVC = TabBarViewController()
-        tabBarVC.modalPresentationStyle = .fullScreen
-        present(tabBarVC, animated: true, completion: nil)
+        UserDefaults.standard.set(true, forKey: UserDefaultsKeys.hasSeenOnboarding)
+        dismiss(animated: true) {
+            if let window = UIApplication.shared.windows.first {
+                window.rootViewController = TabBarViewController()
+            }
+        }
+        
     }
 }
+
