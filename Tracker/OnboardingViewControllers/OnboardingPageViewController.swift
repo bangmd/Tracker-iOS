@@ -5,11 +5,11 @@ final class OnboardingPageViewController: UIPageViewController, UIPageViewContro
     private lazy var pages: [UIViewController] = {
         let firstVC = OnboardingViewController()
         firstVC.backgroundImage = UIImageView(image: UIImage(named: "onboardingFirst"))
-        firstVC.titleLabel.text = "Отслеживайте только то, что хотите"
+        firstVC.titleLabel.text = NSLocalizedString("onboardScreenOne", comment: "")
         
         let secondVC = OnboardingViewController()
         secondVC.backgroundImage = UIImageView(image: UIImage(named: "onboardingSecond"))
-        secondVC.titleLabel.text = "Даже если это не литры воды и йога"
+        secondVC.titleLabel.text = NSLocalizedString("onboardScreenSecond", comment: "")
         return [firstVC, secondVC]
     }()
     

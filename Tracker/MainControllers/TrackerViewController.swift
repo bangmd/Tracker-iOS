@@ -43,7 +43,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     
     private var stubLabel: UILabel = {
         var stubLabel = UILabel()
-        stubLabel.text = "Что будем отслеживать?"
+        stubLabel.text = NSLocalizedString("stubLabelText", comment: "")
         stubLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         stubLabel.textColor = .blackYP
         stubLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -218,7 +218,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     
     private func addTitleLabelToView(){
         let titleLabel = UILabel()
-        titleLabel.text = "Трекеры"
+        titleLabel.text = NSLocalizedString("trackerTitle", comment: "")
         titleLabel.font = UIFont.systemFont(ofSize: 34, weight: .bold)
         titleLabel.textColor = .blackYP
         titleLabel.translatesAutoresizingMaskIntoConstraints = false

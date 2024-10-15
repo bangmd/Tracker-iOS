@@ -10,11 +10,11 @@ final class TabBarViewController: UITabBarController{
         viewControllers = [
             generateVC(
                 viewController: UINavigationController(rootViewController:TrackerViewController()),
-                title: "Трекеры",
+                title: NSLocalizedString("trackerTitle", comment: ""),
                 image: UIImage(named: "trackerTabBarImage")),
             generateVC(
                 viewController: UINavigationController(rootViewController:StatisticViewController()),
-                title: "Статистика",
+                title: NSLocalizedString("statisticTitle", comment: ""),
                 image: UIImage(named: "statisticTabBarImage"))
         ]
         

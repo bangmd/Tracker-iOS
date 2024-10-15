@@ -23,7 +23,7 @@ final class OnboardingViewController: UIViewController{
     // MARK: - Private Properties
     private lazy var actionButton: UIButton = {
         var actionButton = UIButton(type: .system)
-        actionButton.setTitle("Вот это технологии!", for: .normal)
+        actionButton.setTitle(NSLocalizedString("onboardTitleButton", comment: ""), for: .normal)
         actionButton.setTitleColor(.whiteYP, for: .normal)
         actionButton.backgroundColor = .blackYP
         actionButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)

@@ -8,7 +8,7 @@ final class CategoriesViewController: UIViewController{
     
     private lazy var label: UILabel = {
         var label = UILabel()
-        label.text = "Категория"
+        label.text = NSLocalizedString("categoryLabel", comment: "")
         label.textColor = .blackYP
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -30,7 +30,7 @@ final class CategoriesViewController: UIViewController{
     
     private lazy var newCategoryButton: UIButton = {
         var newCategoryButton = UIButton(type: .custom)
-        newCategoryButton.setTitle("Добавить категорию", for: .normal)
+        newCategoryButton.setTitle(NSLocalizedString("addCategoryButton", comment: ""), for: .normal)
         newCategoryButton.backgroundColor = .blackYP
         newCategoryButton.layer.cornerRadius = 16
         newCategoryButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -48,7 +48,7 @@ final class CategoriesViewController: UIViewController{
     
     private lazy var stubLabel: UILabel = {
         var stubLabel = UILabel()
-        stubLabel.text = "Привычки и события можно объединить по смыслу"
+        stubLabel.text = NSLocalizedString("stubLabelMessage", comment: "")
         stubLabel.numberOfLines = 2
         stubLabel.textAlignment = .center
         stubLabel.lineBreakMode = .byWordWrapping
@@ -232,11 +232,11 @@ extension CategoriesViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     private func makeContextMenu(for indexPath: IndexPath) -> UIMenu {
-        let editAction = UIAction(title: "Редактировать", image: UIImage(systemName: "pencil")) { [weak self] action in
+        let editAction = UIAction(title: NSLocalizedString("editActionTitle", comment: ""), image: UIImage(systemName: "pencil")) { [weak self] action in
             self?.editCategory(at: indexPath)
         }
         
-        let deleteAction = UIAction(title: "Удалить", image: UIImage(systemName: "trash"), attributes: .destructive) { [weak self] action in
+        let deleteAction = UIAction(title: NSLocalizedString("deleteActionTitle", comment: ""), image: UIImage(systemName: "trash"), attributes: .destructive) { [weak self] action in
             self?.showDeleteConfirmation(at: indexPath)
         }
         
@@ -255,14 +255,14 @@ extension CategoriesViewController: UITableViewDelegate, UITableViewDataSource {
     
     private func showDeleteConfirmation(at indexPath: IndexPath){
         let alert = UIAlertController(title: nil,
-                                      message: "Эта категория точно не нужна?",
+                                      message: NSLocalizedString("deleteConfirmationMessage", comment: ""),
                                       preferredStyle: .actionSheet)
         
-        let deleteAction = UIAlertAction(title: "Удалить", style: .destructive) { _ in
+        let deleteAction = UIAlertAction(title: NSLocalizedString("deleteActionTitle", comment: ""), style: .destructive) { _ in
             self.deleteCategory(at: indexPath)
         }
         
-        let cancelAction = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: NSLocalizedString("cancelActionTitle", comment: ""), style: .cancel, handler: nil)
         
         alert.addAction(deleteAction)
         alert.addAction(cancelAction)

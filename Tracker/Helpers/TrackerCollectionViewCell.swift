@@ -77,9 +77,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell{
             plusButton.tintColor = backCellView.backgroundColor
         }
     }
-    
+
     func updateDayCounter(totalCompletedCount: Int){
-        dayCounter.text = "\(totalCompletedCount) дней"
+        let localizedDayCount = String.localizedStringWithFormat(NSLocalizedString("day_count", comment: ""), totalCompletedCount)
+        dayCounter.text = localizedDayCount
     }
     
     @objc

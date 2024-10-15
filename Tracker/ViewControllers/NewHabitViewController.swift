@@ -12,7 +12,7 @@ protocol ViewSetupProtocol {
 
 final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewSetupProtocol{
     // MARK: - Public Properties
-    let tableInformation = ["Категория", "Расписание"]
+    let tableInformation = [NSLocalizedString("categoryTitle", comment: ""), NSLocalizedString("scheduleTitle", comment: "")]
     var selectedDays: Set<DayOfWeeks> = []
     weak var delegate: NewHabitViewControllerDelegate?
     let emojis = ["😊", "😍", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
@@ -26,7 +26,7 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
     
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
-        titleLabel.text = "Новая привычка"
+        titleLabel.text = NSLocalizedString("titleLabel", comment: "")
         titleLabel.textColor = .blackYP
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -36,7 +36,7 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
     
     private lazy var textField: UITextField = {
         var textField = PaddedTextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString("textFieldTitle", comment: "")
         textField.backgroundColor = .backgroundYP
         textField.layer.cornerRadius = 16
         textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
@@ -83,7 +83,7 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
     
     private lazy var saveButton: UIButton = {
         var saveButton = UIButton(type: .system)
-        saveButton.setTitle("Создать", for: .normal)
+        saveButton.setTitle(NSLocalizedString("createButton", comment: ""), for: .normal)
         saveButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.whiteYP, for: .normal)
         saveButton.isEnabled = false
@@ -97,7 +97,7 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
     
     private lazy var cancelButton: UIButton = {
         var cancelButton = UIButton(type: .custom)
-        cancelButton.setTitle("Отменить", for: .normal)
+        cancelButton.setTitle(NSLocalizedString("cancelButton", comment: ""), for: .normal)
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         cancelButton.setTitleColor(.redYP, for: .normal)
         cancelButton.layer.borderWidth = 1.0
@@ -285,7 +285,7 @@ extension NewHabitViewController: UITableViewDataSource{
         cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         cell.configCell(text: tableInformation[indexPath.row], image: UIImage(named: "backward"))
         
-        if /*cell.secondLabel.isHidden == true &&*/ indexPath.row == 0{
+        if indexPath.row == 0{
             cell.selectionStyle = .none
             
             let secondText = selectedCategory?.title ?? "Выберите категорию"
@@ -304,7 +304,7 @@ extension NewHabitViewController: UITableViewDataSource{
             var secondText = ""
             
             if sortedSelectedDays.count >= 7{
-                secondText = "Каждый день"
+                secondText = NSLocalizedString("everyday", comment: "")
             } else {
                 secondText  = sortedSelectedDays.map({ $0.shortName }).joined(separator: ", ")
             }
@@ -350,9 +350,9 @@ extension NewHabitViewController: UITableViewDelegate{
             var secondText = ""
             
             if sortedSelectedDays.count >= 7{
-                secondText = "Каждый день"
+                secondText = NSLocalizedString("everyday", comment: "")
             } else {
-                secondText  = sortedSelectedDays.map({ $0.shortName }).joined(separator: ", ")
+                secondText = sortedSelectedDays.map({ $0.shortName }).joined(separator: ", ")
             }
             
             cell.configCell(text: tableInformation[indexPath.row], secondText: secondText, image: UIImage(named: "backward"))
@@ -419,7 +419,7 @@ extension NewHabitViewController: UICollectionViewDataSource{
             guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as? EmojiHeaderCollectionView else {
                 return EmojiHeaderCollectionView()
             }
-            headerView.label.text = "Цвет"
+            headerView.label.text = NSLocalizedString("colorTitle", comment: "")
             
             return headerView
         }

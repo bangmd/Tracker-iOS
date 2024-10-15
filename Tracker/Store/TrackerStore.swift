@@ -72,7 +72,8 @@ final class TrackerStore {
               let color = trackersCoreData.color, let emoji = trackersCoreData.emoji, let type = trackersCoreData.type
         else { return nil }
         
-        return Tracker(id: id, title: title, color: uiColorMarshalling.color(from: color) ?? UIColor.clear, emoji: emoji, schedule: trackersCoreData.schedule as! Set<DayOfWeeks> , type: TrackerType(rawValue: type) ?? TrackerType.oneTimeEvent)
+        return Tracker(id: id, title: title, color: uiColorMarshalling.color(from: color) ?? UIColor.clear, emoji: emoji, schedule:
+                       (trackersCoreData.schedule as? Set<DayOfWeeks>) ?? [], type: TrackerType(rawValue: type) ?? TrackerType.oneTimeEvent)
     }
     
     func fetchCoreDataTracker(by id: UUID) -> TrackerCoreData? {

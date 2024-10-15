@@ -1,0 +1,70 @@
+"day_count" = "%d день/дня/дней";
+
+// MARK: - Onboarding Screen
+"onboardScreenOne" = "Отслеживайте только то, что хотите";
+"onboardScreenSecond" = "Даже если это не литры воды и йога";
+"onboardTitleButton" = "Вот это технологии!";
+
+// MARK: - Main Screen
+"trackerTitle" = "Трекеры";
+"statisticTitle" = "Статистика";
+"stubLabelText" = "Что будем отслеживать?";
+
+// MARK: - AddNewTrackerVC
+"createTrackerTitle" = "Создание трекера";
+"eventTitleButton" = "Привычка";
+"irregularEventTitleButton" = "Нерегулярные событие";
+
+// MARK: - NewHabitVC
+"categoryTitle" = "Категория";
+"scheduleTitle" = "Расписание";
+"titleLabel" = "Новая привычка";
+"textFieldTitle" = "Введите название трекера";
+"colorTitle" = "Цвет";
+"createButton" = "Создать";
+"cancelButton" = "Отменить";
+
+// MARK: - NewIrregularEventVC
+"titleLabel" = "Новое нерегулярное событие";
+
+// MARK: - ScheduleVC
+"monday" = "Понедельник";
+"tuesday" = "Вторник";
+"wednesday" = "Среда";
+"thursday" = "Четверг";
+"friday" = "Пятница";
+"saturday" = "Суббота";
+"sunday" = "Воскресенье";
+
+"monday_short" = "Пн";
+"tuesday_short" = "Вт";
+"wednesday_short" = "Ср";
+"thursday_short" = "Чт";
+"friday_short" = "Пт";
+"saturday_short" = "Сб";
+"sunday_short" = "Вс";
+
+"scheduleTitle" = "Расписание";
+"doneButtonTitle" = "Готово";
+"everyday" = "Каждый день";
+
+// MARK: - AddNewCategoryVC
+"newCategoryTitle" = "Новая категория";
+"enterCategoryName" = "Введите название категории";
+"doneButtonTitle" = "Готово";
+"errorTitle" = "Ошибка";
+"categoryNameEmptyMessage" = "Название категории не может быть пустым.";
+
+// MARK: - EditCategoryVC
+"editCategoryTitle" = "Редактирование категории";
+
+// MARK: - CategoriesVC
+"categoryLabel" = "Категория";
+"addCategoryButton" = "Добавить категорию";
+"stubLabelMessage" = "Привычки и события можно объединить по смыслу";
+"editActionTitle" = "Редактировать";
+"deleteActionTitle" = "Удалить";
+"deleteConfirmationMessage" = "Эта категория точно не нужна?";
+"cancelActionTitle" = "Отменить";
+
+

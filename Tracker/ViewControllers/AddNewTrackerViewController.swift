@@ -21,7 +21,7 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
     
     private func addTitle(){
         let label = UILabel()
-        label.text = "Создание трекера"
+        label.text = NSLocalizedString("createTrackerTitle", comment: "")
         label.textColor = .blackYP
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         
@@ -36,7 +36,7 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
     
     private func addHabitButton(){
         let habitButton = UIButton(type: .custom)
-        habitButton.setTitle("Привычка", for: .normal)
+        habitButton.setTitle(NSLocalizedString("eventTitleButton", comment: ""), for: .normal)
         habitButton.backgroundColor = .blackYP
         habitButton.layer.cornerRadius = 16
         habitButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -74,7 +74,7 @@ final class AddNewTrackerViewController: UIViewController, NewHabitViewControlle
     
     private func addIrregularEventButton(){
         let irregularEventButton = UIButton(type: .custom)
-        irregularEventButton.setTitle("Нерегулярные событие", for: .normal)
+        irregularEventButton.setTitle(NSLocalizedString("irregularEventTitleButton", comment: ""), for: .normal)
         irregularEventButton.backgroundColor = .blackYP
         irregularEventButton.layer.cornerRadius = 16
         irregularEventButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)

@@ -7,7 +7,7 @@ final class AddNewCategoryViewController: UIViewController, UITextFieldDelegate{
     // MARK: - Private Properties
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
-        titleLabel.text = "Новая категория"
+        titleLabel.text = NSLocalizedString("newCategoryTitle", comment: "")
         titleLabel.textColor = .blackYP
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -17,7 +17,7 @@ final class AddNewCategoryViewController: UIViewController, UITextFieldDelegate{
     
     private lazy var textField: UITextField = {
         var textField = PaddedTextField()
-        textField.placeholder = "Введите название категории"
+        textField.placeholder = NSLocalizedString("enterCategoryName", comment: "")
         textField.backgroundColor = .backgroundYP
         textField.layer.cornerRadius = 16
         textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
@@ -31,7 +31,7 @@ final class AddNewCategoryViewController: UIViewController, UITextFieldDelegate{
     
     private lazy var saveButton: UIButton = {
         var saveButton = UIButton(type: .system)
-        saveButton.setTitle("Готово", for: .normal)
+        saveButton.setTitle(NSLocalizedString("doneButtonTitle", comment: ""), for: .normal)
         saveButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.whiteYP, for: .normal)
         saveButton.isEnabled = false
@@ -104,7 +104,8 @@ final class AddNewCategoryViewController: UIViewController, UITextFieldDelegate{
     @objc
     private func saveButtonTapped(){
         guard let categoryName = textField.text, !categoryName.isEmpty else {
-            presentAlert(title: "Ошибка", message: "Название категории не может быть пустым.")
+            presentAlert(title: NSLocalizedString("errorTitle", comment: ""),
+                         message: NSLocalizedString("categoryNameEmptyMessage", comment: ""))
             return
         }
         
