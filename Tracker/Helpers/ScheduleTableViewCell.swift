@@ -12,6 +12,9 @@ final class ScheduleTableViewCell: UITableViewCell{
     let switchView: UISwitch = {
         let switchView = UISwitch(frame: .zero)
         switchView.onTintColor = .blueYP
+        switchView.backgroundColor = .highlightEmojiColorYP
+        switchView.layer.cornerRadius = 16
+        switchView.clipsToBounds = true
         switchView.translatesAutoresizingMaskIntoConstraints = false
         return switchView
     }()

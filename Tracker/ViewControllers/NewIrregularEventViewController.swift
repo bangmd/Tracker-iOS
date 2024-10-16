@@ -371,7 +371,7 @@ extension NewIrregularEventViewController: UICollectionViewDelegateFlowLayout{
             if let cell = collectionView.cellForItem(at: indexPath) {
                 selectedEmoji = emojis[indexPath.item]
                 cell.layer.cornerRadius = 16
-                cell.backgroundColor = .backgroundYP
+                cell.backgroundColor = .highlightEmojiColorYP
                 checkDataForButton()
             }
         }else if collectionView == colorCollectionView{

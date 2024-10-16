@@ -31,6 +31,7 @@ final class CategoriesViewController: UIViewController{
     private lazy var newCategoryButton: UIButton = {
         var newCategoryButton = UIButton(type: .custom)
         newCategoryButton.setTitle(NSLocalizedString("addCategoryButton", comment: ""), for: .normal)
+        newCategoryButton.setTitleColor(.whiteYP, for: .normal)
         newCategoryButton.backgroundColor = .blackYP
         newCategoryButton.layer.cornerRadius = 16
         newCategoryButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)

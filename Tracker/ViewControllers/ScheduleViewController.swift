@@ -13,12 +13,23 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate{
     private lazy var label: UILabel = {
         var label = UILabel()
         label.text = NSLocalizedString("scheduleTitle", comment: "")
-        label.textColor = .black
+        label.textColor = .blackYP
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        
         view.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    private lazy var doneButton = {
+        let doneButton = UIButton(type: .system)
+        doneButton.setTitle(NSLocalizedString("doneButtonTitle", comment: ""), for: .normal)
+        doneButton.backgroundColor = .blackYP
+        doneButton.setTitleColor(.whiteYP, for: .normal)
+        doneButton.layer.cornerRadius = 16
+        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        doneButton.titleLabel?.textAlignment = .center
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        return doneButton
     }()
     
     private lazy var tableView: UITableView = {
@@ -56,15 +67,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate{
     }
     
     func addDoneButton(){
-        let doneButton = UIButton(type: .custom)
-        doneButton.setTitle(NSLocalizedString("doneButtonTitle", comment: ""), for: .normal)
-        doneButton.backgroundColor = .blackYP
-        doneButton.layer.cornerRadius = 16
-        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        doneButton.titleLabel?.textAlignment = .center
-        
         view.addSubview(doneButton)
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 30),

@@ -33,7 +33,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell{
     
     private lazy var backView: UIView = {
         var backView = UIView()
-        backView.backgroundColor = .whiteYP.withAlphaComponent(0.3)
+        backView.backgroundColor = .white.withAlphaComponent(0.3)
         backView.layer.cornerRadius = 11
         contentView.addSubview(backView)
         backView.translatesAutoresizingMaskIntoConstraints = false
