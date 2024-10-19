@@ -10,14 +10,13 @@ protocol ViewSetupProtocol {
     func addConstraints()
 }
 
-final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewSetupProtocol{
+final class EditHabitViewController: UIViewController, UITextFieldDelegate, ViewSetupProtocol{
     // MARK: - Public Properties
     let tableInformation = [NSLocalizedString("categoryTitle", comment: ""), NSLocalizedString("scheduleTitle", comment: "")]
     var selectedDays: Set<DayOfWeeks> = []
     weak var delegate: NewHabitViewControllerDelegate?
     let emojis = ["😊", "😍", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
     let colors: [UIColor] = [._1, ._2, ._3, ._4, ._5, ._6, ._7, ._8, ._9, ._10, ._11, ._12, ._13, ._14, ._15, ._16, ._17, ._18]
-    var trackerToEdit: Tracker?
     
     // MARK: - Private Properties
     private var selectedEmoji: String?
@@ -27,6 +26,7 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
     
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
+        titleLabel.text = NSLocalizedString("titleLabel", comment: "")
         titleLabel.textColor = .blackYP
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -149,25 +149,10 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
         return contentView
     }()
     
-    // MARK: - Инициализатор
-    init(trackerToEdit: Tracker? = nil) {
-        self.trackerToEdit = trackerToEdit
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpViewController()
-        configureTitleLabel()
-        
-        if let tracker = trackerToEdit {
-            configureForEditing(tracker: tracker)
-        }
     }
     
     // MARK: - Public methods
@@ -238,10 +223,6 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
         ])
     }
     
-    func configureTitleLabel() {
-        titleLabel.text = trackerToEdit == nil ? NSLocalizedString("titleLabel", comment: "") : NSLocalizedString("editTitle", comment: "")
-    }
-    
     func setUpViewController(){
         view.backgroundColor = .whiteYP
         addSubviews()
@@ -267,27 +248,17 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
     
     // MARK: - Private Methods
     @objc
-    private func saveButtonTapped() {
-        if let trackerToEdit = trackerToEdit {
-            let updatedTracker = Tracker(id: trackerToEdit.id,
-                                         title: textField.text ?? "",
-                                         color: selectedColor ?? .whiteYP,
-                                         emoji: selectedEmoji ?? "",
-                                         schedule: selectedDays,
-                                         type: trackerToEdit.type,
-                                         isPinned: trackerToEdit.isPinned)
-
-            delegate?.didCreateNewTracker(updatedTracker, selectedCategory?.title ?? "")
-        } else {
-            let newTracker = Tracker(id: UUID(),
-                                     title: textField.text ?? "",
-                                     color: selectedColor ?? .whiteYP,
-                                     emoji: selectedEmoji ?? "",
-                                     schedule: selectedDays,
-                                     type: .habit,
-                                     isPinned: false)
-            delegate?.didCreateNewTracker(newTracker, selectedCategory?.title ?? "")
-        }
+    private func saveButtonTapped(){
+        let newTracker = Tracker(id: UUID(),
+                                 title: textField.text ?? "",
+                                 color: selectedColor ?? .whiteYP,
+                                 emoji: selectedEmoji ?? "",
+                                 schedule: selectedDays,
+                                 type: .habit,
+                                 isPinned: false)
+    
+        delegate?.didCreateNewTracker(newTracker, selectedCategory?.title ?? "")
+        
         if let rootViewController = self.view.window?.rootViewController{
             rootViewController.dismiss(animated: true)
         }
@@ -298,19 +269,6 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
         if let rootViewController = self.view.window?.rootViewController{
             rootViewController.dismiss(animated: true)
         }
-    }
-    
-    private func configureForEditing(tracker: Tracker) {
-        textField.text = tracker.title
-        selectedColor = tracker.color
-        selectedEmoji = tracker.emoji
-        selectedDays = tracker.schedule
-        selectedCategory = TrackerCategory(title: "Редактируемая категория", trackers: []) // пример
-        
-        tableView.reloadData()
-        emojiCollectionView.reloadData()
-        colorCollectionView.reloadData()
-        checkDataForButton()
     }
 }
 

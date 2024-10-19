@@ -92,11 +92,11 @@ extension TrackerCategoryStore {
         saveContext()
     }
     
-    // MARK: - Private Methods
-    private func fetchCategory(with title: String) -> TrackerCategoryCoreData? {
-        return fetchAllCategories().filter({$0.title == title}).first ?? nil
-    }
+    func fetchCategory(with title: String) -> TrackerCategoryCoreData? {
+       return fetchAllCategories().filter({$0.title == title}).first ?? nil
+   }
     
+    // MARK: - Private Methods
     private func saveContext(){
         do{
             try context.save()

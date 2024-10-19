@@ -54,13 +54,15 @@ struct Tracker{
     let emoji: String
     let schedule: Set<DayOfWeeks>
     let type: TrackerType
+    var isPinned: Bool
     
-    init(id: UUID, title: String, color: UIColor, emoji: String, schedule: Set<DayOfWeeks>, type: TrackerType) {
+    init(id: UUID, title: String, color: UIColor, emoji: String, schedule: Set<DayOfWeeks>, type: TrackerType, isPinned: Bool) {
         self.id = id
         self.title = title
         self.color = color
         self.emoji = emoji
         self.schedule = schedule
         self.type = type
+        self.isPinned = isPinned
     }
 }

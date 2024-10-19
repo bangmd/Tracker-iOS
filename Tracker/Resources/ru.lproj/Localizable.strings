@@ -9,6 +9,7 @@
 "trackerTitle" = "Трекеры";
 "statisticTitle" = "Статистика";
 "stubLabelText" = "Что будем отслеживать?";
+"stubLabelTextSearch" = "Ничего не найдено";
 
 // MARK: - AddNewTrackerVC
 "createTrackerTitle" = "Создание трекера";
@@ -19,13 +20,15 @@
 "categoryTitle" = "Категория";
 "scheduleTitle" = "Расписание";
 "titleLabel" = "Новая привычка";
+"editTitle" = "Редактирование привычки";
 "textFieldTitle" = "Введите название трекера";
 "colorTitle" = "Цвет";
 "createButton" = "Создать";
 "cancelButton" = "Отменить";
 
 // MARK: - NewIrregularEventVC
-"titleLabel" = "Новое нерегулярное событие";
+"createEventTitle" = "Новое нерегулярное событие";
+"editEventTitle" = "Редактирование нерегулярного события";
 
 // MARK: - ScheduleVC
 "monday" = "Понедельник";
@@ -67,4 +70,10 @@
 "deleteConfirmationMessage" = "Эта категория точно не нужна?";
 "cancelActionTitle" = "Отменить";
 
-
+// MARK: - Actions
+"deleteTrackerAction" = "Удалить трекер?";
+"deleteTrackerTextAction" = "Вы уверены, что хотите удалить этот трекер? Это действие нельзя отменить.";
+"unpin"= "Открепить";
+"pin" = "Закрепить";
+"editAction" = "Редактировать";
+"search" = "Поиск";

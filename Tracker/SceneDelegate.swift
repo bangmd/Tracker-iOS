@@ -11,10 +11,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let hasSeenOnboarding = UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasSeenOnboarding)
         
         if hasSeenOnboarding {
-            // Если онбординг был показан, показываем главный экран
             window.rootViewController = TabBarViewController()
         } else {
-            // Если онбординг не был показан, показываем экран онбординга
             window.rootViewController = OnboardingPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
         }
         

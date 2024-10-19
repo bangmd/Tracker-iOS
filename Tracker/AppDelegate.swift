@@ -16,14 +16,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
-    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         let transformerName = NSValueTransformerName("ScheduleTransformer")
         ValueTransformer.setValueTransformer(ScheduleTransformer(), forName: transformerName)
         
-        
         let hasSeenOnboarding = UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasSeenOnboarding)
-        
         window = UIWindow()
         
         if hasSeenOnboarding {
@@ -32,12 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let onboardingVC = OnboardingPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
             window?.rootViewController = onboardingVC
         }
-        
         window?.makeKeyAndVisible()
-        
-//        window = UIWindow()
-//        window?.rootViewController = UINavigationController(rootViewController: TrackerViewController())
-//        window?.makeKeyAndVisible()
         return true
     }
     
@@ -54,7 +46,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-    
-    
 }
 

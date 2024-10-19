@@ -11,6 +11,7 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
     weak var delegate: NewIrregularEventViewControllerDelegate?
     let emojis = ["😊", "😍", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
     let colors: [UIColor] = [._1, ._2, ._3, ._4, ._5, ._6, ._7, ._8, ._9, ._10, ._11, ._12, ._13, ._14, ._15, ._16, ._17, ._18]
+    var trackerToEdit: Tracker?
     
     // MARK: - Private Properties
     private var selectedEmoji: String?
@@ -19,7 +20,7 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
    
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
-        titleLabel.text = NSLocalizedString("titleLabel", comment: "")
+        titleLabel.text = NSLocalizedString("createEventTitle", comment: "")
         titleLabel.textColor = .blackYP
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -132,10 +133,26 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         return contentView
     }()
     
+    // MARK: - Инициализатор
+    init(trackerToEdit: Tracker? = nil) {
+        self.trackerToEdit = trackerToEdit
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
     // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpViewController()
+        configureTitleLabel()
+        
+        if let tracker = trackerToEdit {
+            configureForEditing(tracker: tracker)
+        }
     }
     
     // MARK: - Public methods
@@ -221,6 +238,10 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         ])
     }
     
+    func configureTitleLabel() {
+        titleLabel.text = trackerToEdit == nil ? NSLocalizedString("createEventTitle", comment: "") : NSLocalizedString("editEventTitle", comment: "")
+    }
+    
     func setUpViewController(){
         view.backgroundColor = .whiteYP
         addSubviews()
@@ -229,20 +250,30 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
 
     // MARK: - Private methods
     @objc
-    private func saveButtonTapped(){
-        let newTracker = Tracker(id: UUID(),
-                                 title: textField.text ?? "",
-                                 color: selectedColor ?? .clear,
-                                 emoji: selectedEmoji ?? "",
-                                 schedule: selectedDays,
-                                 type: .oneTimeEvent)
-        
-        delegate?.didCreateNewIrregularEvent(newTracker, selectedCategory?.title ?? "")
-        
+    private func saveButtonTapped() {
+        if let trackerToEdit = trackerToEdit {
+            let updatedTracker = Tracker(id: trackerToEdit.id,
+                                         title: textField.text ?? "",
+                                         color: selectedColor ?? .whiteYP,
+                                         emoji: selectedEmoji ?? "",
+                                         schedule: selectedDays,
+                                         type: trackerToEdit.type,
+                                         isPinned: trackerToEdit.isPinned)
+
+            delegate?.didCreateNewIrregularEvent(updatedTracker, selectedCategory?.title ?? "")
+        } else {
+            let newTracker = Tracker(id: UUID(),
+                                     title: textField.text ?? "",
+                                     color: selectedColor ?? .whiteYP,
+                                     emoji: selectedEmoji ?? "",
+                                     schedule: selectedDays,
+                                     type: .oneTimeEvent,
+                                     isPinned: false)
+            delegate?.didCreateNewIrregularEvent(newTracker, selectedCategory?.title ?? "")
+        }
         if let rootViewController = self.view.window?.rootViewController{
             rootViewController.dismiss(animated: true)
         }
-        
     }
     
     @objc
@@ -250,6 +281,19 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         if let rootViewController = self.view.window?.rootViewController{
             rootViewController.dismiss(animated: true)
         }
+    }
+    
+    private func configureForEditing(tracker: Tracker) {
+        textField.text = tracker.title
+        selectedColor = tracker.color
+        selectedEmoji = tracker.emoji
+        selectedDays = tracker.schedule
+        selectedCategory = TrackerCategory(title: "Редактируемая категория", trackers: []) // пример
+        
+        tableView.reloadData()
+        emojiCollectionView.reloadData()
+        colorCollectionView.reloadData()
+        checkDataForButton()
     }
 }
 
