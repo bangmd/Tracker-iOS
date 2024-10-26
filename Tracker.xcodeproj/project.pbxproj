@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		09AD98D815F9558526B4D2A8 /* Pods_Tracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC49A97369BF2383F3515356 /* Pods_Tracker.framework */; };
 		DB28E0B42C695312009B4024 /* TrackerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB28E0B32C695312009B4024 /* TrackerCollectionViewCell.swift */; };
 		DB2F5C422C59A46C008FF94F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2F5C412C59A46C008FF94F /* AppDelegate.swift */; };
 		DB2F5C442C59A46C008FF94F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB2F5C432C59A46C008FF94F /* SceneDelegate.swift */; };
@@ -48,6 +49,7 @@
 		DBE13C452CCD99DF000109E6 /* MainScreenSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE13C442CCD99DF000109E6 /* MainScreenSnapshotTests.swift */; };
 		DBE13C4E2CCD9BAD000109E6 /* InlineSnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = DBE13C4D2CCD9BAD000109E6 /* InlineSnapshotTesting */; };
 		DBE13C502CCD9BAD000109E6 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = DBE13C4F2CCD9BAD000109E6 /* SnapshotTesting */; };
+		DBE13C522CCDA5E3000109E6 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE13C512CCDA5E3000109E6 /* AnalyticsService.swift */; };
 		DBE5213E2CB1CC7D004C05C1 /* CategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE5213D2CB1CC7D004C05C1 /* CategoriesViewController.swift */; };
 		DBE521402CB1CDF3004C05C1 /* AddNewCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE5213F2CB1CDF3004C05C1 /* AddNewCategoryViewController.swift */; };
 		DBE521422CB2FBFE004C05C1 /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE521412CB2FBFE004C05C1 /* CategoryTableViewCell.swift */; };
@@ -66,6 +68,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		26FA3A82F50E66827898201C /* Pods-Tracker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tracker.release.xcconfig"; path = "Target Support Files/Pods-Tracker/Pods-Tracker.release.xcconfig"; sourceTree = "<group>"; };
+		9D8F7F763DFB6162895D035F /* Pods-Tracker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tracker.debug.xcconfig"; path = "Target Support Files/Pods-Tracker/Pods-Tracker.debug.xcconfig"; sourceTree = "<group>"; };
+		AC49A97369BF2383F3515356 /* Pods_Tracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Tracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB28E0B32C695312009B4024 /* TrackerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCollectionViewCell.swift; sourceTree = "<group>"; };
 		DB2F5C3E2C59A46C008FF94F /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB2F5C412C59A46C008FF94F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -108,6 +113,7 @@
 		DBE13C3C2CCBB1F2000109E6 /* FilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
 		DBE13C422CCD99DF000109E6 /* MainScreenSnapshotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MainScreenSnapshotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBE13C442CCD99DF000109E6 /* MainScreenSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenSnapshotTests.swift; sourceTree = "<group>"; };
+		DBE13C512CCDA5E3000109E6 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		DBE5213D2CB1CC7D004C05C1 /* CategoriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewController.swift; sourceTree = "<group>"; };
 		DBE5213F2CB1CDF3004C05C1 /* AddNewCategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewCategoryViewController.swift; sourceTree = "<group>"; };
 		DBE521412CB2FBFE004C05C1 /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewCell.swift; sourceTree = "<group>"; };
@@ -120,6 +126,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09AD98D815F9558526B4D2A8 /* Pods_Tracker.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,12 +142,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		92F5DBAE16AD77BB7A3ED089 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AC49A97369BF2383F3515356 /* Pods_Tracker.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CD5512C8F4135F25838FA7DC /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				9D8F7F763DFB6162895D035F /* Pods-Tracker.debug.xcconfig */,
+				26FA3A82F50E66827898201C /* Pods-Tracker.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		DB2F5C352C59A46C008FF94F = {
 			isa = PBXGroup;
 			children = (
+				DBE13C512CCDA5E3000109E6 /* AnalyticsService.swift */,
 				DB2F5C402C59A46C008FF94F /* Tracker */,
 				DBE13C432CCD99DF000109E6 /* MainScreenSnapshotTests */,
 				DB2F5C3F2C59A46C008FF94F /* Products */,
+				CD5512C8F4135F25838FA7DC /* Pods */,
+				92F5DBAE16AD77BB7A3ED089 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -323,9 +350,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = DB2F5C522C59A46D008FF94F /* Build configuration list for PBXNativeTarget "Tracker" */;
 			buildPhases = (
+				BF3BFD0DC9DE23EC5858DD94 /* [CP] Check Pods Manifest.lock */,
 				DB2F5C3A2C59A46C008FF94F /* Sources */,
 				DB2F5C3B2C59A46C008FF94F /* Frameworks */,
 				DB2F5C3C2C59A46C008FF94F /* Resources */,
+				C1325A2B95DD4E651D2DEBEF /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -423,6 +452,48 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		BF3BFD0DC9DE23EC5858DD94 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Tracker-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C1325A2B95DD4E651D2DEBEF /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Tracker/Pods-Tracker-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Tracker/Pods-Tracker-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Tracker/Pods-Tracker-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		DB2F5C3A2C59A46C008FF94F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -450,6 +521,7 @@
 				DBBEA0A52C7FE51D00AB4CA9 /* ScheduleTransformer.swift in Sources */,
 				DBBEA09B2C7FDB2500AB4CA9 /* TrackerStore.swift in Sources */,
 				DB3D4E6B2C77F64200909C20 /* EmojiHeaderCollectionView.swift in Sources */,
+				DBE13C522CCDA5E3000109E6 /* AnalyticsService.swift in Sources */,
 				DBBEA09D2C7FDB2E00AB4CA9 /* TrackerCategoryStore.swift in Sources */,
 				DB9D58252C6ABDEC008053D2 /* PaddedTextField.swift in Sources */,
 				DB2F5C442C59A46C008FF94F /* SceneDelegate.swift in Sources */,
@@ -568,7 +640,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -632,7 +704,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -653,6 +725,7 @@
 		};
 		DB2F5C532C59A46D008FF94F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9D8F7F763DFB6162895D035F /* Pods-Tracker.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -685,6 +758,7 @@
 		};
 		DB2F5C542C59A46D008FF94F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 26FA3A82F50E66827898201C /* Pods-Tracker.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

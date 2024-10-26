@@ -1,5 +1,6 @@
 import UIKit
 import CoreData
+import YandexMobileMetrica
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,6 +18,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        guard let configuration = YMMYandexMetricaConfiguration(apiKey: "0b0a3637-e3ff-4dec-9ca7-cf0dce9cba91") else {
+            return true
+        }
+        
+        YMMYandexMetrica.activate(with: configuration)
+        
         let transformerName = NSValueTransformerName("ScheduleTransformer")
         ValueTransformer.setValueTransformer(ScheduleTransformer(), forName: transformerName)
         

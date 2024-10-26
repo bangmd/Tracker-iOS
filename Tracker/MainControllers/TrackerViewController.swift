@@ -11,7 +11,9 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     let trackerRecordStore = TrackerRecordStore()
     var pinnedTrackers: Set<UUID> = []
     
+    
     // MARK: - Private Properties
+    private let analyticsService = Analytics()
     private var currentFilter: TrackerFilter = .allTrackers
     private let filters: [TrackerFilter] = [.allTrackers, .todayTrackers, .completedTrackers, .incompleteTrackers]
 
@@ -125,6 +127,12 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         updateStubUI()
         collectionView.reloadData()
         NotificationCenter.default.addObserver(self, selector: #selector(updateCategories), name: NSNotification.Name("CategoryUpdated"), object: nil)
+        analyticsService.report(event: "open", params:  ["screen": "Main"])
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(true)
+        analyticsService.report(event: "close", params: ["screen": "Main"])
     }
     
     // MARK: - Public Methods
@@ -326,6 +334,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     
     @objc
     private func plusButtonTapped(){
+        analyticsService.report(event: "click", params: ["screen": "Main", "item": "add_track"])
         let newTrackerViewController = AddNewTrackerViewController()
         newTrackerViewController.delegate = self
         present(newTrackerViewController, animated: true, completion: nil)
@@ -333,6 +342,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     
     @objc
     private func filterButtonTapped(){
+        analyticsService.report(event: "click", params: ["screen": "Main", "item": "filter"])
         let filterViewController = FilterViewController()
         filterViewController.delegate = self
         if let index = filters.firstIndex(of: currentFilter) {
@@ -367,7 +377,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         }
     }
 
-    
     @objc
     private func updateCategories() {
         fetchCategory()
@@ -492,9 +501,8 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout{
         collectionView.reloadData()
     }
 
-
-
     func editTracker(at indexPath: IndexPath) {
+        analyticsService.report(event: "click", params: ["screen": "Main", "item": "edit"])
         let tracker = filteredCategories[indexPath.section].trackers[indexPath.row]
         if tracker.type == .habit {
             let editViewController = NewHabitViewController(trackerToEdit: tracker)
@@ -508,6 +516,7 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout{
     }
 
     private func deleteTrackerConfirmation(by id: UUID) {
+        analyticsService.report(event: "click", params: ["screen": "Main", "item": "delete"])
         let alertController = UIAlertController(title: NSLocalizedString("deleteTrackerAction", comment: ""), message: NSLocalizedString("deleteTrackerTextAction", comment: ""), preferredStyle: .actionSheet)
         
         let deleteAction = UIAlertAction(title: NSLocalizedString("deleteActionTitle", comment: ""), style: .destructive) { [weak self] _ in
