@@ -35,6 +35,7 @@
 		DB9D582D2C6D7159008053D2 /* ScheduleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9D582C2C6D7159008053D2 /* ScheduleTableViewCell.swift */; };
 		DB9D582F2C6FFE0E008053D2 /* TrackerCategoryHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9D582E2C6FFE0E008053D2 /* TrackerCategoryHeaderView.swift */; };
 		DB9D58332C712AC7008053D2 /* DaySelection .swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9D58322C712AC7008053D2 /* DaySelection .swift */; };
+		DBA26ABB2CC46B8D00CA32B5 /* StatCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBA26ABA2CC46B8D00CA32B5 /* StatCardView.swift */; };
 		DBB9E8A02CB6BC4500A0FDCD /* CategoriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB9E89F2CB6BC4500A0FDCD /* CategoriesViewModel.swift */; };
 		DBBEA09B2C7FDB2500AB4CA9 /* TrackerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBEA09A2C7FDB2500AB4CA9 /* TrackerStore.swift */; };
 		DBBEA09D2C7FDB2E00AB4CA9 /* TrackerCategoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBEA09C2C7FDB2E00AB4CA9 /* TrackerCategoryStore.swift */; };
@@ -43,6 +44,7 @@
 		DBBEA0A52C7FE51D00AB4CA9 /* ScheduleTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBEA0A42C7FE51D00AB4CA9 /* ScheduleTransformer.swift */; };
 		DBC2E6EF2CBDCFDF00619F64 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DBC2E6ED2CBDCFDF00619F64 /* Localizable.stringsdict */; };
 		DBD934792CBDD07100F75784 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DBD934772CBDD07100F75784 /* Localizable.strings */; };
+		DBE13C3D2CCBB1F2000109E6 /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE13C3C2CCBB1F2000109E6 /* FilterViewController.swift */; };
 		DBE5213E2CB1CC7D004C05C1 /* CategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE5213D2CB1CC7D004C05C1 /* CategoriesViewController.swift */; };
 		DBE521402CB1CDF3004C05C1 /* AddNewCategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE5213F2CB1CDF3004C05C1 /* AddNewCategoryViewController.swift */; };
 		DBE521422CB2FBFE004C05C1 /* CategoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE521412CB2FBFE004C05C1 /* CategoryTableViewCell.swift */; };
@@ -81,6 +83,7 @@
 		DB9D582C2C6D7159008053D2 /* ScheduleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTableViewCell.swift; sourceTree = "<group>"; };
 		DB9D582E2C6FFE0E008053D2 /* TrackerCategoryHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryHeaderView.swift; sourceTree = "<group>"; };
 		DB9D58322C712AC7008053D2 /* DaySelection .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DaySelection .swift"; sourceTree = "<group>"; };
+		DBA26ABA2CC46B8D00CA32B5 /* StatCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatCardView.swift; sourceTree = "<group>"; };
 		DBB9E89F2CB6BC4500A0FDCD /* CategoriesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewModel.swift; sourceTree = "<group>"; };
 		DBBEA09A2C7FDB2500AB4CA9 /* TrackerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerStore.swift; sourceTree = "<group>"; };
 		DBBEA09C2C7FDB2E00AB4CA9 /* TrackerCategoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategoryStore.swift; sourceTree = "<group>"; };
@@ -89,6 +92,7 @@
 		DBBEA0A42C7FE51D00AB4CA9 /* ScheduleTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleTransformer.swift; sourceTree = "<group>"; };
 		DBC2E6EE2CBDCFDF00619F64 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = Localizable.stringsdict; sourceTree = "<group>"; };
 		DBD934782CBDD07100F75784 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = Localizable.strings; sourceTree = "<group>"; };
+		DBE13C3C2CCBB1F2000109E6 /* FilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
 		DBE5213D2CB1CC7D004C05C1 /* CategoriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewController.swift; sourceTree = "<group>"; };
 		DBE5213F2CB1CDF3004C05C1 /* AddNewCategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewCategoryViewController.swift; sourceTree = "<group>"; };
 		DBE521412CB2FBFE004C05C1 /* CategoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewCell.swift; sourceTree = "<group>"; };
@@ -183,6 +187,7 @@
 				DB9D582A2C6D6E63008053D2 /* ScheduleViewController.swift */,
 				DBE5213F2CB1CDF3004C05C1 /* AddNewCategoryViewController.swift */,
 				DB8D4C542CB6D7E500B1F28B /* EditCategoryViewController.swift */,
+				DBE13C3C2CCBB1F2000109E6 /* FilterViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -199,6 +204,7 @@
 				DB3D4E6A2C77F64200909C20 /* EmojiHeaderCollectionView.swift */,
 				DB28E0B32C695312009B4024 /* TrackerCollectionViewCell.swift */,
 				DBF2E1632CB07D2D00499554 /* UserDefaultsKeys.swift */,
+				DBA26ABA2CC46B8D00CA32B5 /* StatCardView.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -361,6 +367,7 @@
 				DB457C332CAF47FE00F1B0E8 /* OnboardingViewController.swift in Sources */,
 				DB2F5C422C59A46C008FF94F /* AppDelegate.swift in Sources */,
 				DB9D58332C712AC7008053D2 /* DaySelection .swift in Sources */,
+				DBE13C3D2CCBB1F2000109E6 /* FilterViewController.swift in Sources */,
 				DB457C312CAF46BF00F1B0E8 /* OnboardingPageViewController.swift in Sources */,
 				DB3D4E6D2C79387B00909C20 /* ColorCollectionViewCell.swift in Sources */,
 				DB3B35262C7E7D2B00441F97 /* TrackerDataModel.xcdatamodeld in Sources */,
@@ -375,6 +382,7 @@
 				DBBEA09D2C7FDB2E00AB4CA9 /* TrackerCategoryStore.swift in Sources */,
 				DB9D58252C6ABDEC008053D2 /* PaddedTextField.swift in Sources */,
 				DB2F5C442C59A46C008FF94F /* SceneDelegate.swift in Sources */,
+				DBA26ABB2CC46B8D00CA32B5 /* StatCardView.swift in Sources */,
 				DB8D4C552CB6D7E500B1F28B /* EditCategoryViewController.swift in Sources */,
 				DB9D58292C6AC710008053D2 /* TrackerTableCell.swift in Sources */,
 				DB2F5C5A2C5BEC53008FF94F /* TabBarViewController.swift in Sources */,

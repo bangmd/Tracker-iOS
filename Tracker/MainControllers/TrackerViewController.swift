@@ -12,6 +12,9 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     var pinnedTrackers: Set<UUID> = []
     
     // MARK: - Private Properties
+    private var currentFilter: TrackerFilter = .allTrackers
+    private let filters: [TrackerFilter] = [.allTrackers, .todayTrackers, .completedTrackers, .incompleteTrackers]
+
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
         titleLabel.text = NSLocalizedString("trackerTitle", comment: "")
@@ -38,6 +41,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         view.addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .whiteYP
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 70, right: 0)
         collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         collectionView.register(
             TrackerCategoryHeaderView.self,
@@ -47,6 +51,19 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         collectionView.dataSource = self
         collectionView.delegate = self
         return collectionView
+    }()
+    
+    private lazy var filterButton: UIButton = {
+        var filterButton = UIButton(type: .system)
+        filterButton.setTitle(NSLocalizedString("Filters", comment: ""), for: .normal)
+        filterButton.setTitleColor(.white, for: .normal)
+        filterButton.backgroundColor = .blueYP
+        filterButton.titleLabel?.font = .systemFont(ofSize: 17, weight: .regular)
+        filterButton.layer.cornerRadius = 16
+        view.addSubview(filterButton)
+        filterButton.translatesAutoresizingMaskIntoConstraints = false
+        filterButton.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
+        return filterButton
     }()
     
     private lazy var searchController: UISearchBar = {
@@ -132,6 +149,11 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            filterButton.heightAnchor.constraint(equalToConstant: 50),
+            filterButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 130),
+            filterButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -131),
+            filterButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100)
         ])
     }
     
@@ -149,11 +171,13 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         guard let dayOfWeek = DayOfWeeks.from(weekday: weekday) else { return }
         
         var filteredCategories: [TrackerCategory] = []
-    
-        let pinnedTrackersList = categories.flatMap { category in
-            category.trackers.filter { $0.isPinned }
-        }
         
+        let pinnedTrackersList = categories.flatMap { category in
+            category.trackers.filter { tracker in
+                tracker.isPinned && tracker.schedule.contains(dayOfWeek)
+            }
+        }
+
         if !pinnedTrackersList.isEmpty {
             filteredCategories.append(TrackerCategory(title: "Закрепленные", trackers: pinnedTrackersList))
         }
@@ -162,14 +186,14 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
             var filteredTrackers: [Tracker] = []
             
             for tracker in category.trackers {
-                if !tracker.isPinned { // Пропускаем закрепленные трекеры
+                if !tracker.isPinned {
                     switch tracker.type {
                     case .habit:
                         if tracker.schedule.contains(dayOfWeek) {
                             filteredTrackers.append(tracker)
                         }
                     case .oneTimeEvent:
-                        if calendar.isDate(date, inSameDayAs: currentDate) {
+                        if calendar.isDate(date, inSameDayAs: Date()) {
                             let record = TrackerRecord(idTracker: tracker.id, date: date)
                             if !completedTrackers.contains(record) {
                                 filteredTrackers.append(tracker)
@@ -189,6 +213,8 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         collectionView.reloadData()
     }
     
+
+
     func didAddNewTracker(_ tracker: Tracker, _ category: String) {
         if trackerCategoryStore.fetchAllCategories().filter({ $0.title == category}).count == 0 {
             let newCategory = TrackerCategory(title: category, trackers: [])
@@ -265,7 +291,8 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy"
         let formattedDate = dateFormatter.string(from: selectedDate)
-        filteredTracker(for: selectedDate)
+        currentDate = selectedDate
+        applyFilter(currentFilter, for: selectedDate)
         collectionView.reloadData()
         updateStubUI()
     }
@@ -304,18 +331,42 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         present(newTrackerViewController, animated: true, completion: nil)
     }
     
+    @objc
+    private func filterButtonTapped(){
+        let filterViewController = FilterViewController()
+        filterViewController.delegate = self
+        if let index = filters.firstIndex(of: currentFilter) {
+            filterViewController.selectedFilterIndex = index
+        }
+        present(filterViewController, animated: true, completion: nil)
+    }
+    
     private func removeStubItem() {
         stubImageView.removeFromSuperview()
         stubLabel.removeFromSuperview()
     }
-    
-    private func updateStubUI(){
-        if filteredCategories.isEmpty {
+
+    private func updateStubUI() {
+        let hasAnyTrackers = hasTrackers(for: currentDate)
+        let hasFilteredTrackers = !filteredCategories.isEmpty
+
+        if !hasAnyTrackers {
+            filterButton.isHidden = true
             addStubItem()
-        }else{
-            removeStubItem()
+            removeStubItemForSearch()
+        } else {
+            filterButton.isHidden = false
+            
+            if !hasFilteredTrackers {
+                addStubItemForSearch()
+                removeStubItem()
+            } else {
+                removeStubItemForSearch()
+                removeStubItem()
+            }
         }
     }
+
     
     @objc
     private func updateCategories() {
@@ -422,23 +473,26 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout{
     private func togglePinTracker(at indexPath: IndexPath) {
         var tracker = filteredCategories[indexPath.section].trackers[indexPath.row]
 
-        if pinnedTrackers.contains(tracker.id) {
-            pinnedTrackers.remove(tracker.id)
+        if tracker.isPinned {
             tracker.isPinned = false
+            tracker.datePinned = nil
         } else {
-            pinnedTrackers.insert(tracker.id)
             tracker.isPinned = true
+            tracker.datePinned = currentDate
         }
-        
+
         if let coreDataTracker = trackerStore.fetchCoreDataTracker(by: tracker.id) {
-            coreDataTracker.isPinned.toggle()
+            coreDataTracker.isPinned = tracker.isPinned
+            coreDataTracker.datePinned = tracker.datePinned
             trackerStore.saveContext()
-            tracker.isPinned = coreDataTracker.isPinned
         }
+
         fetchCategory()
         filteredTracker(for: currentDate)
         collectionView.reloadData()
     }
+
+
 
     func editTracker(at indexPath: IndexPath) {
         let tracker = filteredCategories[indexPath.section].trackers[indexPath.row]
@@ -528,6 +582,7 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
             
             if tracker.type == .oneTimeEvent && calendar.isDate(selectedDate, inSameDayAs: currentDate) {
                 category.trackers.remove(at: indexPath.row)
+                updateStubUI()
                 
                 if category.trackers.isEmpty {
                     filteredCategories.remove(at: indexPath.section)
@@ -597,3 +652,109 @@ extension TrackerViewController: UISearchBarDelegate {
         removeStubItemForSearch()
     }
 }
+
+// MARK: - Filter processing
+extension TrackerViewController{
+    func filterCompletedTrackers(for date: Date) {
+        let calendar = Calendar.current
+        var completedCategories: [TrackerCategory] = []
+        for category in categories {
+            let completedTrackersInCategory = category.trackers.filter { tracker in
+                completedTrackers.contains { (record: TrackerRecord) in
+                    record.idTracker == tracker.id && calendar.isDate(record.date, inSameDayAs: date)
+                }
+            }
+            if !completedTrackersInCategory.isEmpty {
+                completedCategories.append(TrackerCategory(title: category.title, trackers: completedTrackersInCategory))
+            }
+        }
+        self.filteredCategories = completedCategories
+        updateStubUI()
+        collectionView.reloadData()
+    }
+    
+    func filterIncompleteTrackers(for date: Date) {
+        let calendar = Calendar.current
+        var incompleteCategories: [TrackerCategory] = []
+        for category in categories {
+            let incompleteTrackers = category.trackers.filter { tracker in
+                let isCompleted = completedTrackers.contains { completedRecord in
+                    completedRecord.idTracker == tracker.id && calendar.isDate(completedRecord.date, inSameDayAs: date)
+                }
+                
+                let shouldDisplay = tracker.type == .habit
+                    ? tracker.schedule.contains(DayOfWeeks.from(weekday: calendar.component(.weekday, from: date))!)
+                    : true
+                return !isCompleted && shouldDisplay
+            }
+            if !incompleteTrackers.isEmpty {
+                incompleteCategories.append(TrackerCategory(title: category.title, trackers: incompleteTrackers))
+            }
+        }
+
+        self.filteredCategories = incompleteCategories
+        updateStubUI()
+        collectionView.reloadData()
+    }
+    
+    private func hasTrackers(for date: Date) -> Bool {
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: date)
+        guard let dayOfWeek = DayOfWeeks.from(weekday: weekday) else { return false }
+
+        return categories.contains { category in
+            category.trackers.contains { tracker in
+                if tracker.type == .habit {
+                    return tracker.schedule.contains(dayOfWeek)
+                } else if tracker.type == .oneTimeEvent {
+                    return calendar.isDate(currentDate, inSameDayAs: date)
+                }
+                return false
+            }
+        }
+    }
+    
+    private func applyTodayFilter() {
+        let today = Date()
+        currentDate = today
+        datePicker.date = today
+        filteredTracker(for: today)
+        updateStubUI()
+    }
+
+    private func applyFilter(_ filter: TrackerFilter?, for date: Date) {
+        guard let filter = filter else {
+            filteredTracker(for: date)
+            updateStubUI()
+            return
+        }
+
+        switch filter {
+        case .allTrackers:
+            filteredTracker(for: date)
+        case .todayTrackers:
+            if Calendar.current.isDate(currentDate, inSameDayAs: Date()) {
+                filteredTracker(for: currentDate)
+                currentFilter = .allTrackers
+                updateStubUI()
+            } else {
+                applyTodayFilter()
+                currentFilter = .allTrackers
+            }
+        case .completedTrackers:
+            filterCompletedTrackers(for: date)
+        case .incompleteTrackers:
+            filterIncompleteTrackers(for: date)
+        }
+        updateStubUI()
+    }
+}
+
+// MARK: - FilterViewControllerDelegate
+extension TrackerViewController: FilterViewControllerDelegate {
+    func didSelectFilter(_ filter: TrackerFilter) {
+        currentFilter = filter
+        applyFilter(currentFilter, for: datePicker.date)
+    }
+}
+

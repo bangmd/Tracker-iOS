@@ -24,8 +24,8 @@ final class OnboardingViewController: UIViewController{
     private lazy var actionButton: UIButton = {
         var actionButton = UIButton(type: .system)
         actionButton.setTitle(NSLocalizedString("onboardTitleButton", comment: ""), for: .normal)
-        actionButton.setTitleColor(.whiteYP, for: .normal)
-        actionButton.backgroundColor = .blackYP
+        actionButton.setTitleColor(.white, for: .normal)
+        actionButton.backgroundColor = .black
         actionButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         actionButton.layer.cornerRadius = 16
         actionButton.addTarget(self, action: #selector(actionButtonDidTapped), for: .touchUpInside)

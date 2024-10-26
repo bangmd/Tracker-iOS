@@ -8,6 +8,7 @@
 "statisticTitle" = "Statistic";
 "stubLabelText" = "What will we track?";
 "stubLabelTextSearch" = "Nothing found";
+"Filters" = "Filters";
 
 // MARK: - AddNewTrackerVC
 "createTrackerTitle" = "Create Tracker";
@@ -74,3 +75,12 @@
 "pin" = "Pin";
 "editAction" = "Edit";
 "search" = "Search";
+
+// MARK: - Statistic Screen
+"statisticStubLabel"= "There is nothing to analyze yet";
+
+// MARK: - Filter View Controller
+"allTrackers" = "All Trackers";
+"todayTrackers" = "Today's Trackers";
+"completedTrackers" = "Completed";
+"incompleteTrackers" = "Incomplete";

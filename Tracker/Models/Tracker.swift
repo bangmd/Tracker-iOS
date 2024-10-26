@@ -55,8 +55,9 @@ struct Tracker{
     let schedule: Set<DayOfWeeks>
     let type: TrackerType
     var isPinned: Bool
+    var datePinned: Date?
     
-    init(id: UUID, title: String, color: UIColor, emoji: String, schedule: Set<DayOfWeeks>, type: TrackerType, isPinned: Bool) {
+    init(id: UUID, title: String, color: UIColor, emoji: String, schedule: Set<DayOfWeeks>, type: TrackerType, isPinned: Bool, datePinned: Date? = nil) {
         self.id = id
         self.title = title
         self.color = color
@@ -64,5 +65,6 @@ struct Tracker{
         self.schedule = schedule
         self.type = type
         self.isPinned = isPinned
+        self.datePinned = datePinned
     }
 }

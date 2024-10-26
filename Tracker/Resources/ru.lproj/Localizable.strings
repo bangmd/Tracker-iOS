@@ -10,6 +10,7 @@
 "statisticTitle" = "Статистика";
 "stubLabelText" = "Что будем отслеживать?";
 "stubLabelTextSearch" = "Ничего не найдено";
+"Filters" = "Фильтры";
 
 // MARK: - AddNewTrackerVC
 "createTrackerTitle" = "Создание трекера";
@@ -77,3 +78,12 @@
 "pin" = "Закрепить";
 "editAction" = "Редактировать";
 "search" = "Поиск";
+
+// MARK: - Statistic Screen
+"statisticStubLabel"= "Анализировать пока нечего";
+
+//MARK: - FilterViewController
+"allTrackers" = "Все трекеры";
+"todayTrackers" = "Трекеры на сегодня";
+"completedTrackers" = "Завершённые";
+"incompleteTrackers" = "Незавершённые";
