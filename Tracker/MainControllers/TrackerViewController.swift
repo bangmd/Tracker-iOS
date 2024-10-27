@@ -59,6 +59,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         filteredTracker(for: currentDate)
         updateStubUI()
         collectionView.reloadData()
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCategories), name: NSNotification.Name("CategoryUpdated"), object: nil)
     }
     
     // MARK: - Public Methods
@@ -237,6 +238,19 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         }else{
             removeStubItem()
         }
+    }
+    
+    @objc
+    private func updateCategories() {
+        fetchCategory()
+        fetchCompletedTrackers()
+        filteredTracker(for: currentDate)
+        updateStubUI()
+        collectionView.reloadData()
+    }
+        
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name("CategoryUpdated"), object: nil)
     }
 }
 

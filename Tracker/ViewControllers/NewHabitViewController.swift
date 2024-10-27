@@ -1,5 +1,6 @@
 import UIKit
 
+// MARK: - Protocols
 protocol NewHabitViewControllerDelegate: AnyObject{
     func didCreateNewTracker(_ tracker: Tracker, _ category: String)
 }
@@ -233,11 +234,15 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
         let isColorSelected = selectedColor != nil
         let areDaysSelected = !selectedDays.isEmpty
         let isTextFieldFilled = !(textField.text?.isEmpty ?? true)
+        let isCategoryFilled = !(selectedCategory?.title.isEmpty ?? true)
         
-        let allFieldsValid = isEmojiSelected && isColorSelected && areDaysSelected && isTextFieldFilled
+        let allFieldsValid = isEmojiSelected && isColorSelected && areDaysSelected && isTextFieldFilled && isCategoryFilled
         if allFieldsValid {
             saveButton.isEnabled = true
             saveButton.backgroundColor = .blackYP
+        }else {
+            saveButton.isEnabled = false
+            saveButton.backgroundColor = .grayYP
         }
     }
     
@@ -250,7 +255,7 @@ final class NewHabitViewController: UIViewController, UITextFieldDelegate, ViewS
                                  emoji: selectedEmoji ?? "",
                                  schedule: selectedDays,
                                  type: .habit)
-        
+    
         delegate?.didCreateNewTracker(newTracker, selectedCategory?.title ?? "")
         
         if let rootViewController = self.view.window?.rootViewController{
@@ -277,10 +282,15 @@ extension NewHabitViewController: UITableViewDataSource{
             return TrackerTableCell()
         }
         
-        if cell.secondLabel.isHidden == true{
+        cell.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        cell.configCell(text: tableInformation[indexPath.row], image: UIImage(named: "backward"))
+        
+        if /*cell.secondLabel.isHidden == true &&*/ indexPath.row == 0{
             cell.selectionStyle = .none
-            cell.configCell(text: tableInformation[indexPath.row], image: UIImage(named: "backward"))
-        } else {
+            
+            let secondText = selectedCategory?.title ?? "Выберите категорию"
+            cell.configCell(text: tableInformation[indexPath.row], secondText: secondText, image: UIImage(named: "backward"))
+        } else if indexPath.row == 1{
             cell.selectionStyle = .none
             
             let sortedSelectedDays = selectedDays.sorted {
@@ -310,12 +320,42 @@ extension NewHabitViewController: UITableViewDataSource{
 extension NewHabitViewController: UITableViewDelegate{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 0{
-            let categoryViewController = CategoryViewController()
+            let categoryViewController = CategoriesViewController(viewModel: CategoriesViewModel())
             present(categoryViewController, animated: true)
+            
+            categoryViewController.onSaveCategory = {[weak self] newCategory in
+                guard let self = self else { return }
+                self.selectedCategory = TrackerCategory(title: newCategory, trackers: [])
+                let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? TrackerTableCell
+                cell?.showSecondLabel()
+                tableView.reloadData()
+                checkDataForButton()
+            }
         }else if indexPath.row == 1{
             let scheduleViewController = ScheduleViewController()
             scheduleViewController.delegate = self
             present(scheduleViewController, animated: true)
+            
+            guard let cell = tableView.cellForRow(at: IndexPath(row: 1, section: 0)) as? TrackerTableCell else { return }
+            cell.selectionStyle = .none
+            
+            let sortedSelectedDays = selectedDays.sorted {
+                guard let firstIndex = DayOfWeeks.allCases.firstIndex(of: $0),
+                      let secondIndex = DayOfWeeks.allCases.firstIndex(of: $1) else {
+                    return false
+                }
+                return firstIndex < secondIndex
+            }
+            
+            var secondText = ""
+            
+            if sortedSelectedDays.count >= 7{
+                secondText = "Каждый день"
+            } else {
+                secondText  = sortedSelectedDays.map({ $0.shortName }).joined(separator: ", ")
+            }
+            
+            cell.configCell(text: tableInformation[indexPath.row], secondText: secondText, image: UIImage(named: "backward"))
         }
     }
 }

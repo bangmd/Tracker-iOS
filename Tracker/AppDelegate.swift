@@ -21,9 +21,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let transformerName = NSValueTransformerName("ScheduleTransformer")
         ValueTransformer.setValueTransformer(ScheduleTransformer(), forName: transformerName)
         
+        
+        let hasSeenOnboarding = UserDefaults.standard.bool(forKey: UserDefaultsKeys.hasSeenOnboarding)
+        
         window = UIWindow()
-        window?.rootViewController = UINavigationController(rootViewController: TrackerViewController())
+        
+        if hasSeenOnboarding {
+            window?.rootViewController = TabBarViewController()
+        } else {
+            let onboardingVC = OnboardingPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
+            window?.rootViewController = onboardingVC
+        }
+        
         window?.makeKeyAndVisible()
+        
+//        window = UIWindow()
+//        window?.rootViewController = UINavigationController(rootViewController: TrackerViewController())
+//        window?.makeKeyAndVisible()
         return true
     }
     
