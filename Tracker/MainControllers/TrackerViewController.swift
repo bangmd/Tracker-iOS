@@ -6,13 +6,13 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     var completedTrackers = Set<TrackerRecord>()
     var filteredCategories: [TrackerCategory] = []
     var currentDate = Date()
-    let trackerStore = TrackerStore()
-    let trackerCategoryStore = TrackerCategoryStore()
-    let trackerRecordStore = TrackerRecordStore()
     var pinnedTrackers: Set<UUID> = []
     
     
     // MARK: - Private Properties
+    private let trackerStore = TrackerStore()
+    private let trackerCategoryStore = TrackerCategoryStore()
+    private let trackerRecordStore = TrackerRecordStore()
     private let analyticsService = Analytics()
     private var currentFilter: TrackerFilter = .allTrackers
     private let filters: [TrackerFilter] = [.allTrackers, .todayTrackers, .completedTrackers, .incompleteTrackers]

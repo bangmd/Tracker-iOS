@@ -163,9 +163,10 @@ final class CategoriesViewController: UIViewController{
         show(addVC, sender: nil)
         
         addVC.onSave = { [weak self] newCategory in
-            self?.viewModel.addCategory(title: newCategory)
-            self?.tableView.reloadData()
-            self?.updateStubUI()
+            guard let self else { return }
+            self.viewModel.addCategory(title: newCategory)
+            self.tableView.reloadData()
+            self.updateStubUI()
         }
     }
 }
