@@ -585,9 +585,11 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
         if let existingRecord = completedTrackers.first(where: { $0.idTracker == trackerID && calendar.isDate($0.date, inSameDayAs: selectedDate) }) {
             completedTrackers.remove(existingRecord)
             trackerRecordStore.removeRecord(for: existingRecord)
+            NotificationCenter.default.post(name: .didUpdateStatistics, object: nil)
         } else {
             completedTrackers.insert(record)
             trackerRecordStore.addNewRecord(from: record)
+            NotificationCenter.default.post(name: .didUpdateStatistics, object: nil)
             
             if tracker.type == .oneTimeEvent && calendar.isDate(selectedDate, inSameDayAs: currentDate) {
                 category.trackers.remove(at: indexPath.row)
@@ -766,4 +768,9 @@ extension TrackerViewController: FilterViewControllerDelegate {
         applyFilter(currentFilter, for: datePicker.date)
     }
 }
+
+extension Notification.Name {
+    static let didUpdateStatistics = Notification.Name("didUpdateStatistics")
+}
+
 

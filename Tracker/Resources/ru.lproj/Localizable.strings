@@ -81,6 +81,8 @@
 
 // MARK: - Statistic Screen
 "statisticStubLabel"= "Анализировать пока нечего";
+"trackersEnd" = "Трекеров завершено";
+
 
 //MARK: - FilterViewController
 "allTrackers" = "Все трекеры";

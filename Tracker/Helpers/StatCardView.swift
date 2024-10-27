@@ -30,6 +30,11 @@ final class StatCardView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Public Methods
+    func configValue(value: Int) {
+        numberLabel.text = "\(value)"
+    }
+    
     // MARK: - Gradient Border
     override func layoutSubviews() {
         super.layoutSubviews()

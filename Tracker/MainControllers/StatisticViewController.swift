@@ -1,7 +1,10 @@
 import UIKit
 
-final class StatisticViewController: UIViewController{
+final class StatisticViewController: UIViewController {
     // MARK: - Private Properties
+    private let trackerRecordStore = TrackerRecordStore()
+    private var completedTrackers: Set<TrackerRecord> = []
+
     private lazy var stubImageView: UIImageView = {
         var stubImageView = UIImageView(image: UIImage(named: "statisticStub"))
         stubImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -20,70 +23,63 @@ final class StatisticViewController: UIViewController{
         return stubLabel
     }()
     
+    private lazy var completedTrackersCard: StatCardView = {
+        let card = StatCardView(number: 0, title: NSLocalizedString("trackersEnd", comment: ""))
+        card.translatesAutoresizingMaskIntoConstraints = false
+        return card
+    }()
+    
     // MARK: - Life View Cycle
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateStatistics), name: .didUpdateStatistics, object: nil)
+        updateStatistics()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: .didUpdateStatistics, object: nil)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpViewController()
-        
-        // Создаем UIStackView для карточек
-                let stackView = UIStackView()
-                stackView.axis = .vertical
-                stackView.spacing = 16
-                stackView.distribution = .fillEqually
-                stackView.translatesAutoresizingMaskIntoConstraints = false
-                view.addSubview(stackView)
-                
-                // Данные для карточек
-                let data = [
-                    (number: 6, title: "Лучший период"),
-                    (number: 2, title: "Идеальные дни"),
-                    (number: 5, title: "Трекеров завершено"),
-                    (number: 4, title: "Среднее значение")
-                ]
-                
-                // Создаем и добавляем карточки в стек
-                for item in data {
-                    let statCard = StatCardView(number: item.number, title: item.title)
-                    statCard.translatesAutoresizingMaskIntoConstraints = false
-                    statCard.heightAnchor.constraint(equalToConstant: 100).isActive = true
-                    stackView.addArrangedSubview(statCard)
-                }
-                
-                // Устанавливаем констрейнты для стека
-                NSLayoutConstraint.activate([
-                    stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-                    stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-                    stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-                    stackView.bottomAnchor.constraint(lessThanOrEqualTo: view.bottomAnchor, constant: -20)
-                ])
+        loadStatistics()
     }
     
     // MARK: - Setup Methods
-    func setUpViewController(){
+    @objc
+    private func updateStatistics() {
+        completedTrackers = trackerRecordStore.fetchAllCompletedTrackers()
+        
+        if completedTrackers.isEmpty {
+            showStubItem()
+        } else {
+            removeStubItem()
+            completedTrackersCard.configValue(value: completedTrackers.count)
+        }
+    }
+    
+    private func setUpViewController() {
         view.backgroundColor = .whiteYP
-        addSubviews()
-        addConstraints()
-        addStubItem()
         self.title = NSLocalizedString("statisticTitle", comment: "")
         navigationController?.navigationBar.prefersLargeTitles = true
-    }
-    
-    func addSubviews(){
+        
         view.addSubview(stubImageView)
         view.addSubview(stubLabel)
+        view.addSubview(completedTrackersCard)
+        
+        addConstraints()
+        showStubItem()
     }
     
-    func addConstraints(){
-//        NSLayoutConstraint.activate([
-//            gradientBorderView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//            gradientBorderView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-//            gradientBorderView.widthAnchor.constraint(equalToConstant: 343),
-//            gradientBorderView.heightAnchor.constraint(equalToConstant: 90)
-//        ])
-    }
-    
-    func addStubItem(){
+    private func addConstraints() {
         NSLayoutConstraint.activate([
+            completedTrackersCard.topAnchor.constraint(equalTo: view.topAnchor, constant: 206),
+            completedTrackersCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            completedTrackersCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            completedTrackersCard.heightAnchor.constraint(equalToConstant: 100),
+            
             stubImageView.widthAnchor.constraint(equalToConstant: 80),
             stubImageView.heightAnchor.constraint(equalToConstant: 80),
             stubImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -94,24 +90,21 @@ final class StatisticViewController: UIViewController{
         ])
     }
     
-    // MARK: - Private methods
+    private func showStubItem() {
+        stubImageView.isHidden = false
+        stubLabel.isHidden = false
+        completedTrackersCard.isHidden = true
+    }
+    
     private func removeStubItem() {
         stubImageView.isHidden = true
         stubLabel.isHidden = true
+        completedTrackersCard.isHidden = false
     }
     
-    private func showStubItem(){
-        stubImageView.isHidden = false
-        stubLabel.isHidden = false
+    // MARK: - Data Processing
+    private func loadStatistics() {
+        updateStatistics()
     }
-    
-//    private func updateStubUI(){
-//        if viewModel.numbersOfCategories == 0{
-//            showStubItem()
-//        }else{
-//            removeStubItem()
-//        }
-//    }
-    
-    
 }
+

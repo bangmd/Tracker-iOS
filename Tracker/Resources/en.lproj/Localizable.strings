@@ -78,6 +78,7 @@
 
 // MARK: - Statistic Screen
 "statisticStubLabel"= "There is nothing to analyze yet";
+"trackersEnd" = "Trackers completed";
 
 // MARK: - Filter View Controller
 "allTrackers" = "All Trackers";
