@@ -569,20 +569,19 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout{
 // MARK: - TrackerCollectionViewCellProtocol
 extension TrackerViewController: TrackerCollectionViewCellProtocol{
     func didTapPlusButton(in cell: TrackerCollectionViewCell) {
-        let selectedDate = datePicker.date
-        let formattedSelectedDate = formatDate(selectedDate)
-        let formattedCurrentDate = formatDate(currentDate)
-        
-        guard let indexPath = collectionView.indexPath(for: cell), formattedSelectedDate <= formattedCurrentDate else { return }
+        let currentDate = Calendar.current.startOfDay(for: Date())
+        let selectedDate = Calendar.current.startOfDay(for: datePicker.date)
+
+        guard selectedDate <= currentDate else { return }
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
         
         var category = filteredCategories[indexPath.section]
         let tracker = category.trackers[indexPath.row]
         
         let trackerID = tracker.id
         let record = TrackerRecord(idTracker: trackerID, date: selectedDate)
-        let calendar = Calendar.current
         
-        if let existingRecord = completedTrackers.first(where: { $0.idTracker == trackerID && calendar.isDate($0.date, inSameDayAs: selectedDate) }) {
+        if let existingRecord = completedTrackers.first(where: { $0.idTracker == trackerID && Calendar.current.isDate($0.date, inSameDayAs: selectedDate) }) {
             completedTrackers.remove(existingRecord)
             trackerRecordStore.removeRecord(for: existingRecord)
             NotificationCenter.default.post(name: .didUpdateStatistics, object: nil)
@@ -591,7 +590,7 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
             trackerRecordStore.addNewRecord(from: record)
             NotificationCenter.default.post(name: .didUpdateStatistics, object: nil)
             
-            if tracker.type == .oneTimeEvent && calendar.isDate(selectedDate, inSameDayAs: currentDate) {
+            if tracker.type == .oneTimeEvent && Calendar.current.isDate(selectedDate, inSameDayAs: currentDate) {
                 category.trackers.remove(at: indexPath.row)
                 updateStubUI()
                 
@@ -619,7 +618,7 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
             }
         }
         
-        let isDone = completedTrackers.contains { $0.idTracker == trackerID && calendar.isDate($0.date, inSameDayAs: selectedDate) }
+        let isDone = completedTrackers.contains { $0.idTracker == trackerID && Calendar.current.isDate($0.date, inSameDayAs: selectedDate) }
         let totalCompletedCount = completedTrackers.filter { $0.idTracker == tracker.id }.count
         
         cell.updateDayCounter(totalCompletedCount: totalCompletedCount)
