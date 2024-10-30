@@ -111,25 +111,37 @@ final class TrackerStore {
             saveContext()
         }
     }
-    
+
     func updateTracker(_ tracker: Tracker, newCategory: String) {
         guard let coreDataTracker = fetchCoreDataTracker(by: tracker.id) else {
             print("Трекер с ID \(tracker.id) не найден.")
             return
         }
 
-        guard let newCategoryCoreData = TrackerCategoryStore().fetchCategory(with: newCategory) else {
-            print("Категория с названием \(newCategory) не найдена.")
+        var newCategoryCoreData: TrackerCategoryCoreData?
+
+        if !newCategory.isEmpty && newCategory != "Закрепленные" {
+            newCategoryCoreData = TrackerCategoryStore().fetchCategory(with: newCategory)
+        } else {
+            newCategoryCoreData = coreDataTracker.category
+        }
+
+        guard let categoryCoreData = newCategoryCoreData else {
+            print("Категория не найдена.")
             return
         }
-        
+
         coreDataTracker.title = tracker.title
         coreDataTracker.color = UIColorMarshalling().hexString(from: tracker.color)
         coreDataTracker.emoji = tracker.emoji
         coreDataTracker.schedule = tracker.schedule as NSSet
         coreDataTracker.isPinned = tracker.isPinned
+        coreDataTracker.datePinned = tracker.datePinned
 
-        coreDataTracker.category = newCategoryCoreData
+        if coreDataTracker.category != categoryCoreData {
+            coreDataTracker.category = categoryCoreData
+        }
+
         saveContext()
     }
 }

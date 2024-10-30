@@ -8,7 +8,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
     var currentDate = Date()
     var pinnedTrackers: Set<UUID> = []
     
-    
     // MARK: - Private Properties
     private let trackerStore = TrackerStore()
     private let trackerCategoryStore = TrackerCategoryStore()
@@ -182,10 +181,19 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         
         let pinnedTrackersList = categories.flatMap { category in
             category.trackers.filter { tracker in
-                tracker.isPinned && tracker.schedule.contains(dayOfWeek)
+                if tracker.isPinned {
+                    switch tracker.type {
+                    case .habit:
+                        return tracker.schedule.contains(dayOfWeek)
+                    case .oneTimeEvent:
+                        return calendar.isDate(date, inSameDayAs: Date())
+                    }
+                } else {
+                    return false
+                }
             }
         }
-
+        
         if !pinnedTrackersList.isEmpty {
             filteredCategories.append(TrackerCategory(title: "Закрепленные", trackers: pinnedTrackersList))
         }
@@ -220,8 +228,6 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         updateStubUI()
         collectionView.reloadData()
     }
-    
-
 
     func didAddNewTracker(_ tracker: Tracker, _ category: String) {
         if trackerCategoryStore.fetchAllCategories().filter({ $0.title == category}).count == 0 {
@@ -244,7 +250,7 @@ final class TrackerViewController: UIViewController, AddNewTrackerViewController
         collectionView.reloadData()
         updateStubUI()
     }
-        
+    
     func didCreateNewTracker(_ tracker: Tracker, _ newCategory: String) {
         trackerStore.updateTracker(tracker, newCategory: newCategory)
         fetchCategory()
@@ -504,12 +510,14 @@ extension TrackerViewController: UICollectionViewDelegateFlowLayout{
     func editTracker(at indexPath: IndexPath) {
         analyticsService.report(event: "click", params: ["screen": "Main", "item": "edit"])
         let tracker = filteredCategories[indexPath.section].trackers[indexPath.row]
+        let category = filteredCategories[indexPath.section]
+        let totalCompletedCount = completedTrackers.filter { $0.idTracker == tracker.id }.count
         if tracker.type == .habit {
-            let editViewController = NewHabitViewController(trackerToEdit: tracker)
+            let editViewController = NewHabitViewController(trackerToEdit: tracker, category: category.title, completedDaysCount: totalCompletedCount)
             editViewController.delegate = self
             present(editViewController, animated: true, completion: nil)
         } else if tracker.type == .oneTimeEvent {
-            let editViewController = NewIrregularEventViewController(trackerToEdit: tracker)
+            let editViewController = NewIrregularEventViewController(trackerToEdit: tracker, category: category.title)
             editViewController.delegate = self
             present(editViewController, animated: true, completion: nil)
         }
@@ -613,7 +621,6 @@ extension TrackerViewController: TrackerCollectionViewCellProtocol{
                         categories.remove(at: originalCategoryIndex)
                     }
                 }
-                
                 return
             }
         }

@@ -12,7 +12,7 @@ protocol FilterViewControllerDelegate: AnyObject {
     func didSelectFilter(_ filter: TrackerFilter)
 }
 
-class FilterViewController: UIViewController {
+final class FilterViewController: UIViewController {
     // MARK: - Public Properties
     weak var delegate: FilterViewControllerDelegate?
     var selectedFilterIndex: Int?

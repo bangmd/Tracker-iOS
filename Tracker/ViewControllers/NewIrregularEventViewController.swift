@@ -17,6 +17,7 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
     private var selectedCategory: TrackerCategory?
+    private let colorMarshalling = UIColorMarshalling()
    
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
@@ -134,8 +135,11 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
     }()
     
     // MARK: - Инициализатор
-    init(trackerToEdit: Tracker? = nil) {
+    init(trackerToEdit: Tracker? = nil, category: String? = nil) {
         self.trackerToEdit = trackerToEdit
+        if let category = category {
+            self.selectedCategory = TrackerCategory(title: category, trackers: [])
+        }
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -151,7 +155,8 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         configureTitleLabel()
         
         if let tracker = trackerToEdit {
-            configureForEditing(tracker: tracker)
+            configureForEditing(tracker: tracker, category: selectedCategory?.title ?? "")
+            saveButton.setTitle(NSLocalizedString("save", comment: ""), for: .normal)
         }
     }
     
@@ -258,7 +263,8 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
                                          emoji: selectedEmoji ?? "",
                                          schedule: selectedDays,
                                          type: trackerToEdit.type,
-                                         isPinned: trackerToEdit.isPinned)
+                                         isPinned: trackerToEdit.isPinned,
+                                         datePinned: trackerToEdit.datePinned)
 
             delegate?.didCreateNewIrregularEvent(updatedTracker, selectedCategory?.title ?? "")
         } else {
@@ -268,7 +274,8 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
                                      emoji: selectedEmoji ?? "",
                                      schedule: selectedDays,
                                      type: .oneTimeEvent,
-                                     isPinned: false)
+                                     isPinned: false,
+                                     datePinned: nil)
             delegate?.didCreateNewIrregularEvent(newTracker, selectedCategory?.title ?? "")
         }
         if let rootViewController = self.view.window?.rootViewController{
@@ -295,6 +302,29 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         colorCollectionView.reloadData()
         checkDataForButton()
     }
+    
+    private func configureForEditing(tracker: Tracker, category: String) {
+        textField.text = tracker.title
+        
+        selectedColor = tracker.color
+        if let selectedColor = selectedColor,
+           let colorIndex = colors.firstIndex(where: { colorMarshalling.hexString(from: $0) == colorMarshalling.hexString(from: selectedColor) }) {
+            let indexPath = IndexPath(item: colorIndex, section: 0)
+            colorCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredHorizontally)
+        }
+        
+        selectedEmoji = tracker.emoji
+        if let selectedEmoji = selectedEmoji,
+           let emojiIndex = emojis.firstIndex(of: selectedEmoji) {
+            let indexPath = IndexPath(item: emojiIndex, section: 0)
+            emojiCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredHorizontally)
+        }
+        
+        selectedCategory = TrackerCategory(title: category, trackers: [])
+        
+        tableView.reloadData()
+        checkDataForButton()
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -308,11 +338,15 @@ extension NewIrregularEventViewController: UITableViewDataSource{
             return TrackerTableCell()
         }
         cell.selectionStyle = .none
-        cell.configCell(text: tableInformation[indexPath.row], image: UIImage(named: "backward"))
-        
-        let secondText = selectedCategory?.title ?? "Выберите категорию"
-        cell.configCell(text: tableInformation[indexPath.row], secondText: secondText, image: UIImage(named: "backward"))
-        
+        let mainText = tableInformation[indexPath.row]
+           let secondText = selectedCategory?.title ?? "Выберите категорию"
+           if trackerToEdit != nil || selectedCategory != nil {
+               cell.showSecondLabel()
+               cell.configCell(text: mainText, secondText: secondText, image: UIImage(named: "backward"))
+           } else {
+               cell.secondLabel.isHidden = true
+               cell.configCell(text: mainText, image: UIImage(named: "backward"))
+           }
         return cell
     }
 }
@@ -353,12 +387,36 @@ extension NewIrregularEventViewController: UICollectionViewDataSource{
                 return EmojiCollectionViewCell()
             }
             cell.configureCell(emoji: emojis[indexPath.row])
+            
+            if emojis[indexPath.row] == selectedEmoji {
+                cell.layer.cornerRadius = 16
+                cell.backgroundColor = .highlightEmojiColorYP
+            } else {
+                cell.layer.cornerRadius = 0
+                cell.backgroundColor = .clear
+            }
+            
             return cell
         }else if collectionView == colorCollectionView{
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "colorCell", for: indexPath) as? ColorCollectionViewCell else {
                 return ColorCollectionViewCell()
             }
+            let currentColor = colors[indexPath.row]
             cell.setColorToCell(color: colors[indexPath.row])
+            
+            let currentColorHex = colorMarshalling.hexString(from: currentColor)
+            let selectedColorHex = selectedColor != nil ? colorMarshalling.hexString(from: selectedColor!) : ""
+            
+            if currentColorHex == selectedColorHex {
+                cell.layer.borderWidth = 3
+                cell.layer.cornerRadius = 8
+                cell.layer.borderColor = selectedColor?.withAlphaComponent(0.3).cgColor
+            } else {
+                cell.layer.borderWidth = 0
+                cell.layer.cornerRadius = 0
+                cell.layer.borderColor = .none
+            }
+            
             return cell
         }
         return UICollectionViewCell()
@@ -421,6 +479,7 @@ extension NewIrregularEventViewController: UICollectionViewDelegateFlowLayout{
         }else if collectionView == colorCollectionView{
             if let cell = collectionView.cellForItem(at: indexPath){
                 selectedColor = colors[indexPath.item]
+                collectionView.reloadData()
                 cell.layer.borderWidth = 3
                 cell.layer.cornerRadius = 8
                 cell.layer.borderColor = selectedColor?.withAlphaComponent(0.3).cgColor

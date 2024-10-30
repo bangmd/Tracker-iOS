@@ -61,6 +61,7 @@
 
 // MARK: - EditCategoryVC
 "editCategoryTitle" = "Редактирование категории";
+"save" = "Сохранить";
 
 // MARK: - CategoriesVC
 "categoryLabel" = "Категория";

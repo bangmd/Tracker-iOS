@@ -58,6 +58,7 @@
 
 // MARK: - EditCategoryVC
 "editCategoryTitle" = "Edit Category";
+"save" = "Save";
 
 // MARK: - CategoriesVC
 "categoryLabel" = "Category";
