@@ -1,0 +1,88 @@
+// MARK: - Onboarding Screen
+"onboardScreenOne" = "Track only what you want";
+"onboardScreenSecond" = "Even if it's not liters of water and yoga";
+"onboardTitleButton" = "This is technology!";
+
+// MARK: - Main Screen
+"trackerTitle" = "Trackers";
+"statisticTitle" = "Statistic";
+"stubLabelText" = "What will we track?";
+"stubLabelTextSearch" = "Nothing found";
+"Filters" = "Filters";
+
+// MARK: - AddNewTrackerVC
+"createTrackerTitle" = "Create Tracker";
+"eventTitleButton" = "Habit";
+"editTitle" = "Edit Tracker";
+"irregularEventTitleButton" = "Irregular Event";
+
+// MARK: - NewHabitVC
+"categoryTitle" = "Category";
+"scheduleTitle" = "Schedule";
+"titleLabel" = "New Habit";
+"textFieldTitle" = "Enter tracker name";
+"colorTitle" = "Color";
+"createButton" = "Create";
+"cancelButton" = "Cancel";
+
+// MARK: - NewIrregularEventVC
+"createEventTitle" = "New Irregular Event";
+"editEventTitle" = "Edit Irregular Event";
+
+// MARK: - ScheduleVC
+"monday" = "Monday";
+"tuesday" = "Tuesday";
+"wednesday" = "Wednesday";
+"thursday" = "Thursday";
+"friday" = "Friday";
+"saturday" = "Saturday";
+"sunday" = "Sunday";
+
+"monday_short" = "Mon";
+"tuesday_short" = "Tue";
+"wednesday_short" = "Wed";
+"thursday_short" = "Thu";
+"friday_short" = "Fri";
+"saturday_short" = "Sat";
+"sunday_short" = "Sun";
+"scheduleTitle" = "Schedule";
+"doneButtonTitle" = "Done";
+"everyday" = "Everyday";
+
+// MARK: - AddNewCategoryVC
+"newCategoryTitle" = "New Category";
+"enterCategoryName" = "Enter category name";
+"doneButtonTitle" = "Done";
+"errorTitle" = "Error";
+"categoryNameEmptyMessage" = "Category name cannot be empty.";
+
+// MARK: - EditCategoryVC
+"editCategoryTitle" = "Edit Category";
+"save" = "Save";
+
+// MARK: - CategoriesVC
+"categoryLabel" = "Category";
+"addCategoryButton" = "Add Category";
+"stubLabelMessage" = "Habits and events can be grouped meaningfully";
+"editActionTitle" = "Edit";
+"deleteActionTitle" = "Delete";
+"deleteConfirmationMessage" = "Are you sure you no longer need this category?";
+"cancelActionTitle" = "Cancel";
+
+// MARK: - Actions
+"deleteTrackerAction" = "Delete tracker?";
+"deleteTrackerTextAction" = "Are you sure you want to delete this tracker? This action cannot be undone.";
+"unpin" = "Unpin";
+"pin" = "Pin";
+"editAction" = "Edit";
+"search" = "Search";
+
+// MARK: - Statistic Screen
+"statisticStubLabel"= "There is nothing to analyze yet";
+"trackersEnd" = "Trackers completed";
+
+// MARK: - Filter View Controller
+"allTrackers" = "All Trackers";
+"todayTrackers" = "Today's Trackers";
+"completedTrackers" = "Completed";
+"incompleteTrackers" = "Incomplete";

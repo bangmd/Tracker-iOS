@@ -6,8 +6,10 @@
     </entity>
     <entity name="TrackerCoreData" representedClassName="TrackerCoreData" syncable="YES" codeGenerationType="class">
         <attribute name="color" attributeType="String"/>
+        <attribute name="datePinned" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="emoji" attributeType="String"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isPinned" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="schedule" attributeType="Transformable" valueTransformerName="ScheduleTransformer"/>
         <attribute name="title" attributeType="String"/>
         <attribute name="type" attributeType="String"/>

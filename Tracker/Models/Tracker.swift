@@ -5,32 +5,21 @@ enum TrackerType: String{
     case oneTimeEvent = "OneTimeEvent"
 }
 
-enum DayOfWeeks: String, Codable, CaseIterable{
-    case monday = "Понедельник"
-    case tuesday = "Вторник"
-    case wednesday = "Среда"
-    case thursday = "Четверг"
-    case friday = "Пятница"
-    case saturday = "Суббота"
-    case sunday = "Воскресенье"
+enum DayOfWeeks: String, Codable, CaseIterable {
+    case monday
+    case tuesday
+    case wednesday
+    case thursday
+    case friday
+    case saturday
+    case sunday
     
-    var shortName: String{
-        switch self{
-        case .monday: 
-            return "Пн"
-        case .tuesday:
-            return "Вт"
-        case .wednesday:
-            return "Ср"
-        case .thursday:
-            return "Чт"
-        case .friday:
-            return "Пт"
-        case .saturday:
-            return "Сб"
-        case .sunday:
-            return "Вс"
-        }
+    var fullName: String {
+        return NSLocalizedString(self.rawValue, comment: "")
+    }
+    
+    var shortName: String {
+        return NSLocalizedString("\(self.rawValue)_short", comment: "")
     }
 }
 
@@ -65,13 +54,17 @@ struct Tracker{
     let emoji: String
     let schedule: Set<DayOfWeeks>
     let type: TrackerType
+    var isPinned: Bool
+    var datePinned: Date?
     
-    init(id: UUID, title: String, color: UIColor, emoji: String, schedule: Set<DayOfWeeks>, type: TrackerType) {
+    init(id: UUID, title: String, color: UIColor, emoji: String, schedule: Set<DayOfWeeks>, type: TrackerType, isPinned: Bool, datePinned: Date? = nil) {
         self.id = id
         self.title = title
         self.color = color
         self.emoji = emoji
         self.schedule = schedule
         self.type = type
+        self.isPinned = isPinned
+        self.datePinned = datePinned
     }
 }

@@ -7,19 +7,29 @@ protocol ScheduleViewControllerProtocol: AnyObject{
 
 final class ScheduleViewController: UIViewController, UITableViewDelegate{
     // MARK: - Private Properties
-    private let weekDays = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье",]
     private var daySelection = DaySelection()
     weak var delegate: ScheduleViewControllerProtocol?
     
     private lazy var label: UILabel = {
         var label = UILabel()
-        label.text = "Расписание"
-        label.textColor = .black
+        label.text = NSLocalizedString("scheduleTitle", comment: "")
+        label.textColor = .blackYP
         label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        
         view.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    private lazy var doneButton = {
+        let doneButton = UIButton(type: .system)
+        doneButton.setTitle(NSLocalizedString("doneButtonTitle", comment: ""), for: .normal)
+        doneButton.backgroundColor = .blackYP
+        doneButton.setTitleColor(.whiteYP, for: .normal)
+        doneButton.layer.cornerRadius = 16
+        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        doneButton.titleLabel?.textAlignment = .center
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        return doneButton
     }()
     
     private lazy var tableView: UITableView = {
@@ -57,15 +67,7 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate{
     }
     
     func addDoneButton(){
-        let doneButton = UIButton(type: .custom)
-        doneButton.setTitle("Готово", for: .normal)
-        doneButton.backgroundColor = .blackYP
-        doneButton.layer.cornerRadius = 16
-        doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        doneButton.titleLabel?.textAlignment = .center
-        
         view.addSubview(doneButton)
-        doneButton.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 30),
@@ -85,7 +87,6 @@ final class ScheduleViewController: UIViewController, UITableViewDelegate{
     
     @objc
     private func DoneButtonTapped(){
-        let newHabitViewController = NewHabitViewController()
         dismiss(animated: true)
         delegate?.didUpdateSelectedDays(daySelection.selectedDays)
     }
@@ -101,10 +102,10 @@ extension ScheduleViewController: UITableViewDataSource{
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? ScheduleTableViewCell else {
             return ScheduleTableViewCell()
         }
-        let day = DayOfWeeks.allCases[indexPath.row]
+        let day = DayOfWeeks.allCases[indexPath.row].fullName
         
         cell.selectionStyle = .none
-        cell.configCell(text: day.rawValue)
+        cell.configCell(text: day)
         cell.switchView.tag = indexPath.row
         cell.switchView.addTarget(self, action: #selector(switchChanged(_:)), for: .valueChanged)
         

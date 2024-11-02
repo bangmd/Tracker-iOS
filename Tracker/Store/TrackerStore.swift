@@ -47,6 +47,7 @@ final class TrackerStore {
         newTracker.emoji = tracker.emoji
         newTracker.schedule = tracker.schedule as NSSet
         newTracker.type = tracker.type.rawValue
+        newTracker.isPinned = tracker.isPinned
         return newTracker
     }
     
@@ -62,7 +63,9 @@ final class TrackerStore {
                 color: uiColorMarshalling.color(from: trackerCoreData.color ?? "") ?? UIColor.clear,
                 emoji: trackerCoreData.emoji ?? "",
                 schedule: trackerCoreData.schedule as? Set<DayOfWeeks> ?? [],
-                type: TrackerType(rawValue: trackerCoreData.type ?? "") ?? TrackerType.oneTimeEvent)
+                type: TrackerType(rawValue: trackerCoreData.type ?? "") ?? TrackerType.oneTimeEvent,
+                isPinned: trackerCoreData.isPinned
+            )
         }
         return trackers
     }
@@ -72,7 +75,8 @@ final class TrackerStore {
               let color = trackersCoreData.color, let emoji = trackersCoreData.emoji, let type = trackersCoreData.type
         else { return nil }
         
-        return Tracker(id: id, title: title, color: uiColorMarshalling.color(from: color) ?? UIColor.clear, emoji: emoji, schedule: trackersCoreData.schedule as! Set<DayOfWeeks> , type: TrackerType(rawValue: type) ?? TrackerType.oneTimeEvent)
+        return Tracker(id: id, title: title, color: uiColorMarshalling.color(from: color) ?? UIColor.clear, emoji: emoji, schedule:
+                        (trackersCoreData.schedule as? Set<DayOfWeeks>) ?? [], type: TrackerType(rawValue: type) ?? TrackerType.oneTimeEvent, isPinned: trackersCoreData.isPinned)
     }
     
     func fetchCoreDataTracker(by id: UUID) -> TrackerCoreData? {
@@ -93,12 +97,52 @@ final class TrackerStore {
         saveContext()
     }
     
-    private func saveContext(){
+    func saveContext(){
         do{
             try context.save()
         } catch {
             print("Failed to save context: \(error)")
         }
+    }
+    
+    func savePinnedState(for tracker: Tracker) {
+        if let coreDataTracker = fetchCoreDataTracker(by: tracker.id) {
+            coreDataTracker.isPinned = tracker.isPinned
+            saveContext()
+        }
+    }
+
+    func updateTracker(_ tracker: Tracker, newCategory: String) {
+        guard let coreDataTracker = fetchCoreDataTracker(by: tracker.id) else {
+            print("Трекер с ID \(tracker.id) не найден.")
+            return
+        }
+
+        var newCategoryCoreData: TrackerCategoryCoreData?
+
+        if !newCategory.isEmpty && newCategory != "Закрепленные" {
+            newCategoryCoreData = TrackerCategoryStore().fetchCategory(with: newCategory)
+        } else {
+            newCategoryCoreData = coreDataTracker.category
+        }
+
+        guard let categoryCoreData = newCategoryCoreData else {
+            print("Категория не найдена.")
+            return
+        }
+
+        coreDataTracker.title = tracker.title
+        coreDataTracker.color = UIColorMarshalling().hexString(from: tracker.color)
+        coreDataTracker.emoji = tracker.emoji
+        coreDataTracker.schedule = tracker.schedule as NSSet
+        coreDataTracker.isPinned = tracker.isPinned
+        coreDataTracker.datePinned = tracker.datePinned
+
+        if coreDataTracker.category != categoryCoreData {
+            coreDataTracker.category = categoryCoreData
+        }
+
+        saveContext()
     }
 }
 

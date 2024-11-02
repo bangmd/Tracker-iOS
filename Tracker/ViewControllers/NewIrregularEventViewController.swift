@@ -6,20 +6,22 @@ protocol NewIrregularEventViewControllerDelegate: AnyObject{
 
 final class NewIrregularEventViewController: UIViewController, UITextFieldDelegate, ViewSetupProtocol{
     // MARK: - Public Properties
-    let tableInformation = ["Категория"]
+    let tableInformation = [NSLocalizedString("categoryTitle", comment: "")]
     var selectedDays: Set<DayOfWeeks> = []
     weak var delegate: NewIrregularEventViewControllerDelegate?
     let emojis = ["😊", "😍", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
     let colors: [UIColor] = [._1, ._2, ._3, ._4, ._5, ._6, ._7, ._8, ._9, ._10, ._11, ._12, ._13, ._14, ._15, ._16, ._17, ._18]
+    var trackerToEdit: Tracker?
     
     // MARK: - Private Properties
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
     private var selectedCategory: TrackerCategory?
+    private let colorMarshalling = UIColorMarshalling()
    
     private lazy var titleLabel: UILabel = {
         let titleLabel = UILabel()
-        titleLabel.text = "Новое нерегулярное событие"
+        titleLabel.text = NSLocalizedString("createEventTitle", comment: "")
         titleLabel.textColor = .blackYP
         titleLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -29,7 +31,7 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
     
     private lazy var textField: UITextField = {
         var textField = PaddedTextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = NSLocalizedString("textFieldTitle", comment: "")
         textField.backgroundColor = .backgroundYP
         textField.layer.cornerRadius = 16
         textField.font = UIFont.systemFont(ofSize: 17, weight: .regular)
@@ -66,7 +68,7 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
     
     private lazy var saveButton: UIButton = {
         var saveButton = UIButton(type: .custom)
-        saveButton.setTitle("Создать", for: .normal)
+        saveButton.setTitle(NSLocalizedString("createButton", comment: ""), for: .normal)
         saveButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         saveButton.setTitleColor(.whiteYP, for: .normal)
         saveButton.backgroundColor = .grayYP
@@ -80,7 +82,7 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
     
     private lazy var cancelButton: UIButton = {
         var cancelButton = UIButton(type: .custom)
-        cancelButton.setTitle("Отменить", for: .normal)
+        cancelButton.setTitle(NSLocalizedString("cancelButton", comment: ""), for: .normal)
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         cancelButton.setTitleColor(.redYP, for: .normal)
         cancelButton.layer.borderWidth = 1.0
@@ -132,10 +134,30 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         return contentView
     }()
     
+    // MARK: - Инициализатор
+    init(trackerToEdit: Tracker? = nil, category: String? = nil) {
+        self.trackerToEdit = trackerToEdit
+        if let category = category {
+            self.selectedCategory = TrackerCategory(title: category, trackers: [])
+        }
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    
     // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpViewController()
+        configureTitleLabel()
+        
+        if let tracker = trackerToEdit {
+            configureForEditing(tracker: tracker, category: selectedCategory?.title ?? "")
+            saveButton.setTitle(NSLocalizedString("save", comment: ""), for: .normal)
+        }
     }
     
     // MARK: - Public methods
@@ -221,6 +243,10 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         ])
     }
     
+    func configureTitleLabel() {
+        titleLabel.text = trackerToEdit == nil ? NSLocalizedString("createEventTitle", comment: "") : NSLocalizedString("editEventTitle", comment: "")
+    }
+    
     func setUpViewController(){
         view.backgroundColor = .whiteYP
         addSubviews()
@@ -229,20 +255,32 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
 
     // MARK: - Private methods
     @objc
-    private func saveButtonTapped(){
-        let newTracker = Tracker(id: UUID(),
-                                 title: textField.text ?? "",
-                                 color: selectedColor ?? .clear,
-                                 emoji: selectedEmoji ?? "",
-                                 schedule: selectedDays,
-                                 type: .oneTimeEvent)
-        
-        delegate?.didCreateNewIrregularEvent(newTracker, selectedCategory?.title ?? "")
-        
+    private func saveButtonTapped() {
+        if let trackerToEdit = trackerToEdit {
+            let updatedTracker = Tracker(id: trackerToEdit.id,
+                                         title: textField.text ?? "",
+                                         color: selectedColor ?? .whiteYP,
+                                         emoji: selectedEmoji ?? "",
+                                         schedule: selectedDays,
+                                         type: trackerToEdit.type,
+                                         isPinned: trackerToEdit.isPinned,
+                                         datePinned: trackerToEdit.datePinned)
+
+            delegate?.didCreateNewIrregularEvent(updatedTracker, selectedCategory?.title ?? "")
+        } else {
+            let newTracker = Tracker(id: UUID(),
+                                     title: textField.text ?? "",
+                                     color: selectedColor ?? .whiteYP,
+                                     emoji: selectedEmoji ?? "",
+                                     schedule: selectedDays,
+                                     type: .oneTimeEvent,
+                                     isPinned: false,
+                                     datePinned: nil)
+            delegate?.didCreateNewIrregularEvent(newTracker, selectedCategory?.title ?? "")
+        }
         if let rootViewController = self.view.window?.rootViewController{
             rootViewController.dismiss(animated: true)
         }
-        
     }
     
     @objc
@@ -250,6 +288,42 @@ final class NewIrregularEventViewController: UIViewController, UITextFieldDelega
         if let rootViewController = self.view.window?.rootViewController{
             rootViewController.dismiss(animated: true)
         }
+    }
+    
+    private func configureForEditing(tracker: Tracker) {
+        textField.text = tracker.title
+        selectedColor = tracker.color
+        selectedEmoji = tracker.emoji
+        selectedDays = tracker.schedule
+        selectedCategory = TrackerCategory(title: "Редактируемая категория", trackers: []) // пример
+        
+        tableView.reloadData()
+        emojiCollectionView.reloadData()
+        colorCollectionView.reloadData()
+        checkDataForButton()
+    }
+    
+    private func configureForEditing(tracker: Tracker, category: String) {
+        textField.text = tracker.title
+        
+        selectedColor = tracker.color
+        if let selectedColor = selectedColor,
+           let colorIndex = colors.firstIndex(where: { colorMarshalling.hexString(from: $0) == colorMarshalling.hexString(from: selectedColor) }) {
+            let indexPath = IndexPath(item: colorIndex, section: 0)
+            colorCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredHorizontally)
+        }
+        
+        selectedEmoji = tracker.emoji
+        if let selectedEmoji = selectedEmoji,
+           let emojiIndex = emojis.firstIndex(of: selectedEmoji) {
+            let indexPath = IndexPath(item: emojiIndex, section: 0)
+            emojiCollectionView.selectItem(at: indexPath, animated: false, scrollPosition: .centeredHorizontally)
+        }
+        
+        selectedCategory = TrackerCategory(title: category, trackers: [])
+        
+        tableView.reloadData()
+        checkDataForButton()
     }
 }
 
@@ -264,11 +338,15 @@ extension NewIrregularEventViewController: UITableViewDataSource{
             return TrackerTableCell()
         }
         cell.selectionStyle = .none
-        cell.configCell(text: tableInformation[indexPath.row], image: UIImage(named: "backward"))
-        
-        let secondText = selectedCategory?.title ?? "Выберите категорию"
-        cell.configCell(text: tableInformation[indexPath.row], secondText: secondText, image: UIImage(named: "backward"))
-        
+        let mainText = tableInformation[indexPath.row]
+           let secondText = selectedCategory?.title ?? "Выберите категорию"
+           if trackerToEdit != nil || selectedCategory != nil {
+               cell.showSecondLabel()
+               cell.configCell(text: mainText, secondText: secondText, image: UIImage(named: "backward"))
+           } else {
+               cell.secondLabel.isHidden = true
+               cell.configCell(text: mainText, image: UIImage(named: "backward"))
+           }
         return cell
     }
 }
@@ -309,12 +387,36 @@ extension NewIrregularEventViewController: UICollectionViewDataSource{
                 return EmojiCollectionViewCell()
             }
             cell.configureCell(emoji: emojis[indexPath.row])
+            
+            if emojis[indexPath.row] == selectedEmoji {
+                cell.layer.cornerRadius = 16
+                cell.backgroundColor = .highlightEmojiColorYP
+            } else {
+                cell.layer.cornerRadius = 0
+                cell.backgroundColor = .clear
+            }
+            
             return cell
         }else if collectionView == colorCollectionView{
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "colorCell", for: indexPath) as? ColorCollectionViewCell else {
                 return ColorCollectionViewCell()
             }
+            let currentColor = colors[indexPath.row]
             cell.setColorToCell(color: colors[indexPath.row])
+            
+            let currentColorHex = colorMarshalling.hexString(from: currentColor)
+            let selectedColorHex = selectedColor != nil ? colorMarshalling.hexString(from: selectedColor!) : ""
+            
+            if currentColorHex == selectedColorHex {
+                cell.layer.borderWidth = 3
+                cell.layer.cornerRadius = 8
+                cell.layer.borderColor = selectedColor?.withAlphaComponent(0.3).cgColor
+            } else {
+                cell.layer.borderWidth = 0
+                cell.layer.cornerRadius = 0
+                cell.layer.borderColor = .none
+            }
+            
             return cell
         }
         return UICollectionViewCell()
@@ -340,7 +442,7 @@ extension NewIrregularEventViewController: UICollectionViewDataSource{
             guard let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as? EmojiHeaderCollectionView else {
                 return EmojiHeaderCollectionView()
             }
-            headerView.label.text = "Цвет"
+            headerView.label.text = NSLocalizedString("colorTitle", comment: "")
             
             return headerView
         }
@@ -371,12 +473,13 @@ extension NewIrregularEventViewController: UICollectionViewDelegateFlowLayout{
             if let cell = collectionView.cellForItem(at: indexPath) {
                 selectedEmoji = emojis[indexPath.item]
                 cell.layer.cornerRadius = 16
-                cell.backgroundColor = .backgroundYP
+                cell.backgroundColor = .highlightEmojiColorYP
                 checkDataForButton()
             }
         }else if collectionView == colorCollectionView{
             if let cell = collectionView.cellForItem(at: indexPath){
                 selectedColor = colors[indexPath.item]
+                collectionView.reloadData()
                 cell.layer.borderWidth = 3
                 cell.layer.cornerRadius = 8
                 cell.layer.borderColor = selectedColor?.withAlphaComponent(0.3).cgColor

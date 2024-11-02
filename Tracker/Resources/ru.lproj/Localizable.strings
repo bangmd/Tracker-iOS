@@ -1,0 +1,92 @@
+"day_count" = "%d день/дня/дней";
+
+// MARK: - Onboarding Screen
+"onboardScreenOne" = "Отслеживайте только то, что хотите";
+"onboardScreenSecond" = "Даже если это не литры воды и йога";
+"onboardTitleButton" = "Вот это технологии!";
+
+// MARK: - Main Screen
+"trackerTitle" = "Трекеры";
+"statisticTitle" = "Статистика";
+"stubLabelText" = "Что будем отслеживать?";
+"stubLabelTextSearch" = "Ничего не найдено";
+"Filters" = "Фильтры";
+
+// MARK: - AddNewTrackerVC
+"createTrackerTitle" = "Создание трекера";
+"eventTitleButton" = "Привычка";
+"irregularEventTitleButton" = "Нерегулярные событие";
+
+// MARK: - NewHabitVC
+"categoryTitle" = "Категория";
+"scheduleTitle" = "Расписание";
+"titleLabel" = "Новая привычка";
+"editTitle" = "Редактирование привычки";
+"textFieldTitle" = "Введите название трекера";
+"colorTitle" = "Цвет";
+"createButton" = "Создать";
+"cancelButton" = "Отменить";
+
+// MARK: - NewIrregularEventVC
+"createEventTitle" = "Новое нерегулярное событие";
+"editEventTitle" = "Редактирование нерегулярного события";
+
+// MARK: - ScheduleVC
+"monday" = "Понедельник";
+"tuesday" = "Вторник";
+"wednesday" = "Среда";
+"thursday" = "Четверг";
+"friday" = "Пятница";
+"saturday" = "Суббота";
+"sunday" = "Воскресенье";
+
+"monday_short" = "Пн";
+"tuesday_short" = "Вт";
+"wednesday_short" = "Ср";
+"thursday_short" = "Чт";
+"friday_short" = "Пт";
+"saturday_short" = "Сб";
+"sunday_short" = "Вс";
+
+"scheduleTitle" = "Расписание";
+"doneButtonTitle" = "Готово";
+"everyday" = "Каждый день";
+
+// MARK: - AddNewCategoryVC
+"newCategoryTitle" = "Новая категория";
+"enterCategoryName" = "Введите название категории";
+"doneButtonTitle" = "Готово";
+"errorTitle" = "Ошибка";
+"categoryNameEmptyMessage" = "Название категории не может быть пустым.";
+
+// MARK: - EditCategoryVC
+"editCategoryTitle" = "Редактирование категории";
+"save" = "Сохранить";
+
+// MARK: - CategoriesVC
+"categoryLabel" = "Категория";
+"addCategoryButton" = "Добавить категорию";
+"stubLabelMessage" = "Привычки и события можно объединить по смыслу";
+"editActionTitle" = "Редактировать";
+"deleteActionTitle" = "Удалить";
+"deleteConfirmationMessage" = "Эта категория точно не нужна?";
+"cancelActionTitle" = "Отменить";
+
+// MARK: - Actions
+"deleteTrackerAction" = "Удалить трекер?";
+"deleteTrackerTextAction" = "Вы уверены, что хотите удалить этот трекер? Это действие нельзя отменить.";
+"unpin"= "Открепить";
+"pin" = "Закрепить";
+"editAction" = "Редактировать";
+"search" = "Поиск";
+
+// MARK: - Statistic Screen
+"statisticStubLabel"= "Анализировать пока нечего";
+"trackersEnd" = "Трекеров завершено";
+
+
+//MARK: - FilterViewController
+"allTrackers" = "Все трекеры";
+"todayTrackers" = "Трекеры на сегодня";
+"completedTrackers" = "Завершённые";
+"incompleteTrackers" = "Незавершённые";

@@ -33,7 +33,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell{
     
     private lazy var backView: UIView = {
         var backView = UIView()
-        backView.backgroundColor = .whiteYP.withAlphaComponent(0.3)
+        backView.backgroundColor = .white.withAlphaComponent(0.3)
         backView.layer.cornerRadius = 11
         contentView.addSubview(backView)
         backView.translatesAutoresizingMaskIntoConstraints = false
@@ -77,9 +77,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell{
             plusButton.tintColor = backCellView.backgroundColor
         }
     }
-    
+
     func updateDayCounter(totalCompletedCount: Int){
-        dayCounter.text = "\(totalCompletedCount) дней"
+        let localizedDayCount = String.localizedStringWithFormat(NSLocalizedString("day_count", comment: ""), totalCompletedCount)
+        dayCounter.text = localizedDayCount
     }
     
     @objc
